@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="OstéoPMI">
+<meta name="theme-color" content="#2D6A4F">
+<title>OstéoPMI — Suivi 1000 Premiers Jours</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Nunito+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green-deep: #2D6A4F;
+  --green-mid: #40916C;
+  --green-light: #74C69D;
+  --green-pale: #D8F3DC;
+  --rose: #E8A8A0;
+  --rose-pale: #FDE8E6;
+  --amber: #F4A261;
+  --amber-pale: #FEF3E2;
+  --cream: #F8F5F0;
+  --white: #FFFFFF;
+  --text: #1F2937;
+  --text-mid: #4B5563;
+  --text-soft: #9CA3AF;
+  --border: #E5E7EB;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
+  --shadow-lg: 0 8px 32px rgba(45,106,79,0.15);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* HEADER */
+.app-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: var(--white);
+  padding: calc(var(--safe-top) + 12px) 20px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.app-header-brand { display: flex; align-items: center; gap: 10px; }
+.app-header-logo {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--green-deep), var(--green-mid));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.app-header-title { font-size: 15px; font-weight: 800; color: var(--green-deep); line-height: 1.1; }
+.app-header-sub { font-size: 11px; font-weight: 500; color: var(--text-soft); }
+.header-date-badge {
+  background: var(--green-pale); color: var(--green-deep);
+  padding: 5px 10px; border-radius: 20px;
+  font-size: 12px; font-weight: 700;
+}
+
+/* BOTTOM NAV */
+.bottom-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 100;
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  display: flex;
+  padding-bottom: var(--safe-bottom);
+}
+.nav-btn {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  padding: 10px 4px 8px;
+  background: none; border: none; cursor: pointer;
+  color: var(--text-soft); font-family: 'Nunito', sans-serif;
+  transition: color 0.2s;
+}
+.nav-btn.active { color: var(--green-deep); }
+.nav-btn .nav-icon { font-size: 22px; margin-bottom: 2px; }
+.nav-btn .nav-label { font-size: 10px; font-weight: 700; letter-spacing: 0.3px; }
+.nav-btn.active .nav-label { color: var(--green-deep); }
+.nav-btn.active .nav-dot {
+  width: 4px; height: 4px; border-radius: 2px;
+  background: var(--green-mid); margin: 0 auto; margin-top: 2px;
+}
+
+/* MAIN CONTENT */
+.main-content {
+  padding-top: calc(var(--safe-top) + 68px);
+  padding-bottom: calc(var(--safe-bottom) + 72px);
+  min-height: 100vh;
+}
+.page { display: none; padding: 16px; }
+.page.active { display: block; }
+
+/* CARDS */
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 14px;
+}
+.card-header {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px;
+}
+.card-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+}
+.card-icon.green { background: var(--green-pale); }
+.card-icon.rose { background: var(--rose-pale); }
+.card-icon.amber { background: var(--amber-pale); }
+.card-title { font-size: 15px; font-weight: 800; color: var(--text); }
+.card-subtitle { font-size: 12px; color: var(--text-soft); font-weight: 500; }
+
+/* FORM ELEMENTS */
+.form-group { margin-bottom: 16px; }
+.form-label {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 700; color: var(--text-mid);
+  margin-bottom: 7px;
+}
+.form-label .required { color: var(--rose); font-size: 14px; }
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  padding: 13px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--white);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.form-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239CA3AF' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 40px;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--green-mid);
+  box-shadow: 0 0 0 3px rgba(64,145,108,0.12);
+}
+.form-input:disabled, .form-select:disabled {
+  background: #F3F4F6; color: var(--text-soft); opacity: 0.7;
+}
+.form-textarea { resize: none; min-height: 80px; line-height: 1.5; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-hint { font-size: 11px; color: var(--text-soft); margin-top: 4px; font-weight: 500; }
+
+/* EVA SLIDER */
+.eva-container { position: relative; }
+.eva-display {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px;
+}
+.eva-value {
+  width: 52px; height: 52px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 800;
+  transition: background 0.3s, color 0.3s;
+}
+.eva-label { font-size: 12px; color: var(--text-soft); font-weight: 600; }
+.eva-slider {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 8px; border-radius: 4px;
+  background: #E5E7EB; outline: none;
+  transition: background 0.3s;
+}
+.eva-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--white);
+  border: 3px solid var(--green-mid);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  cursor: pointer;
+}
+.eva-scale { display: flex; justify-content: space-between; margin-top: 4px; }
+.eva-scale span { font-size: 10px; color: var(--text-soft); font-weight: 600; }
+
+/* TOGGLE CHIPS */
+.chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  padding: 8px 16px; border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--white); color: var(--text-mid);
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s;
+}
+.chip:active { transform: scale(0.97); }
+.chip.selected { background: var(--green-pale); border-color: var(--green-mid); color: var(--green-deep); }
+.chip.selected-rose { background: var(--rose-pale); border-color: var(--rose); color: #B85050; }
+.chip.selected-amber { background: var(--amber-pale); border-color: var(--amber); color: #925F2A; }
+
+/* STATUT CHIPS */
+.statut-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.statut-chip {
+  padding: 12px 10px; border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: var(--white); color: var(--text-mid);
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px; font-weight: 700;
+  cursor: pointer; text-align: center;
+  transition: all 0.15s;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.statut-chip .chip-emoji { font-size: 20px; }
+.statut-chip.active-green { background: var(--green-pale); border-color: var(--green-mid); color: var(--green-deep); }
+.statut-chip.active-red { background: #FEE2E2; border-color: #FCA5A5; color: #DC2626; }
+.statut-chip.active-amber { background: var(--amber-pale); border-color: var(--amber); color: #925F2A; }
+.statut-chip.active-blue { background: #EFF6FF; border-color: #93C5FD; color: #1D4ED8; }
+
+/* RISK TOGGLE */
+.risk-toggle {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px;
+  background: #FEF2F2; border: 1.5px solid #FECACA; border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.risk-toggle.active { background: #FEE2E2; border-color: #F87171; }
+.risk-label { display: flex; align-items: center; gap: 10px; }
+.risk-label-text { font-size: 14px; font-weight: 700; color: #DC2626; }
+.risk-sub { font-size: 11px; color: #EF4444; font-weight: 500; }
+.toggle-switch {
+  width: 48px; height: 28px; border-radius: 14px;
+  background: #D1D5DB; position: relative; transition: background 0.2s;
+  flex-shrink: 0;
+}
+.toggle-switch.on { background: #EF4444; }
+.toggle-knob {
+  width: 22px; height: 22px; border-radius: 11px;
+  background: var(--white); position: absolute;
+  top: 3px; left: 3px; transition: transform 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.toggle-switch.on .toggle-knob { transform: translateX(20px); }
+
+/* SUBMIT BUTTON */
+.btn-primary {
+  width: 100%; padding: 17px;
+  background: linear-gradient(135deg, var(--green-deep), var(--green-mid));
+  color: var(--white); border: none; border-radius: var(--radius-sm);
+  font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 800;
+  cursor: pointer; letter-spacing: 0.3px;
+  box-shadow: 0 4px 16px rgba(45,106,79,0.35);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.btn-primary:active { transform: scale(0.99); box-shadow: 0 2px 8px rgba(45,106,79,0.25); }
+.btn-secondary {
+  width: 100%; padding: 14px;
+  background: var(--white); color: var(--green-deep);
+  border: 1.5px solid var(--green-light); border-radius: var(--radius-sm);
+  font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700;
+  cursor: pointer; margin-top: 10px;
+  transition: background 0.15s;
+}
+.btn-secondary:active { background: var(--green-pale); }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--text); color: var(--white);
+  padding: 12px 24px; border-radius: 24px;
+  font-size: 14px; font-weight: 700; white-space: nowrap;
+  opacity: 0; transition: all 0.3s; z-index: 200;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.success { background: var(--green-deep); }
+.toast.error { background: #DC2626; }
+
+/* SECTION DIVIDER */
+.section-divider {
+  display: flex; align-items: center; gap: 10px;
+  margin: 20px 0 14px;
+}
+.section-divider-line { flex: 1; height: 1px; background: var(--border); }
+.section-divider-label {
+  font-size: 11px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--text-soft);
+  white-space: nowrap;
+}
+
+/* PATIENT LIST */
+.patient-item {
+  background: var(--white); border-radius: var(--radius);
+  padding: 16px; margin-bottom: 10px;
+  box-shadow: var(--shadow);
+  display: flex; align-items: flex-start; gap: 14px;
+  cursor: pointer; transition: transform 0.15s;
+}
+.patient-item:active { transform: scale(0.99); }
+.patient-avatar {
+  width: 44px; height: 44px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+.avatar-green { background: var(--green-pale); }
+.avatar-rose { background: var(--rose-pale); }
+.avatar-amber { background: var(--amber-pale); }
+.patient-info { flex: 1; min-width: 0; }
+.patient-name { font-size: 15px; font-weight: 800; color: var(--text); }
+.patient-detail { font-size: 12px; color: var(--text-soft); font-weight: 500; margin-top: 2px; }
+.patient-meta { display: flex; gap: 6px; margin-top: 7px; flex-wrap: wrap; }
+.badge {
+  padding: 3px 9px; border-radius: 20px;
+  font-size: 11px; font-weight: 700;
+}
+.badge-green { background: var(--green-pale); color: var(--green-deep); }
+.badge-red { background: #FEE2E2; color: #DC2626; }
+.badge-amber { background: var(--amber-pale); color: #925F2A; }
+.badge-blue { background: #EFF6FF; color: #1D4ED8; }
+.badge-gray { background: #F3F4F6; color: var(--text-mid); }
+.badge-risk { background: #FEE2E2; color: #DC2626; }
+.patient-eva { text-align: right; flex-shrink: 0; }
+.eva-mini { font-size: 11px; color: var(--text-soft); font-weight: 600; }
+.eva-mini span { font-size: 15px; font-weight: 800; color: var(--text); }
+.eva-arrow { font-size: 10px; color: var(--text-soft); margin: 0 2px; }
+.delta-positive { color: var(--green-mid); font-weight: 700; font-size: 12px; }
+
+/* SEARCH */
+.search-box {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--white); border-radius: var(--radius-sm);
+  padding: 12px 16px; margin-bottom: 14px;
+  box-shadow: var(--shadow);
+  border: 1.5px solid var(--border);
+}
+.search-box input {
+  flex: 1; border: none; outline: none;
+  font-family: 'Nunito', sans-serif; font-size: 15px;
+  font-weight: 500; color: var(--text); background: none;
+}
+.search-icon { font-size: 18px; color: var(--text-soft); }
+
+/* DASHBOARD */
+.kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+.kpi-card {
+  background: var(--white); border-radius: var(--radius);
+  padding: 18px 16px; box-shadow: var(--shadow);
+  text-align: center;
+}
+.kpi-value { font-size: 32px; font-weight: 800; color: var(--green-deep); line-height: 1; }
+.kpi-label { font-size: 11px; font-weight: 700; color: var(--text-soft); margin-top: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+.kpi-sub { font-size: 12px; font-weight: 600; color: var(--text-mid); margin-top: 3px; }
+
+/* PROGRESS BAR */
+.progress-bar-container { margin-top: 10px; }
+.progress-label { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.progress-label span { font-size: 12px; font-weight: 700; color: var(--text-mid); }
+.progress-track { height: 10px; background: #E5E7EB; border-radius: 5px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--green-mid), var(--green-light)); border-radius: 5px; transition: width 0.5s ease; }
+
+/* PIE / BAR CHARTS (CSS) */
+.bar-list { margin-top: 8px; }
+.bar-item { margin-bottom: 10px; }
+.bar-item-header { display: flex; justify-content: space-between; margin-bottom: 4px; }
+.bar-item-label { font-size: 13px; font-weight: 600; color: var(--text); }
+.bar-item-val { font-size: 13px; font-weight: 800; color: var(--green-deep); }
+.bar-track { height: 7px; background: #E5E7EB; border-radius: 4px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+.bar-green { background: linear-gradient(90deg, var(--green-mid), var(--green-light)); }
+.bar-rose { background: linear-gradient(90deg, #E8A8A0, #FBBAB4); }
+.bar-amber { background: linear-gradient(90deg, var(--amber), #F8C98B); }
+
+/* EVA IMPACT */
+.eva-impact-card {
+  background: linear-gradient(135deg, var(--green-deep) 0%, var(--green-mid) 100%);
+  border-radius: var(--radius); padding: 22px; color: var(--white);
+  margin-bottom: 14px;
+}
+.eva-impact-title { font-size: 13px; font-weight: 700; opacity: 0.8; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+.eva-impact-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center; }
+.eva-impact-val { font-size: 28px; font-weight: 800; line-height: 1; }
+.eva-impact-label { font-size: 10px; font-weight: 600; opacity: 0.7; margin-top: 3px; }
+.eva-divider { width: 1px; background: rgba(255,255,255,0.3); margin: 0 auto; }
+
+/* GUIDE */
+.guide-step {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 13px 0; border-bottom: 1px solid var(--border);
+}
+.guide-step:last-child { border-bottom: none; }
+.step-num {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: var(--green-pale); color: var(--green-deep);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800; flex-shrink: 0;
+}
+.step-text { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.4; }
+.step-hint { font-size: 12px; color: var(--text-soft); margin-top: 3px; }
+
+.motif-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.motif-table th { background: var(--green-pale); color: var(--green-deep); padding: 10px 8px; font-weight: 800; text-align: left; font-size: 12px; }
+.motif-table td { padding: 8px 8px; border-bottom: 1px solid var(--border); font-weight: 500; color: var(--text-mid); vertical-align: top; }
+.motif-table td:first-child { font-weight: 700; color: var(--text); }
+
+/* EMPTY STATE */
+.empty-state { text-align: center; padding: 40px 20px; }
+.empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-title { font-size: 17px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+.empty-sub { font-size: 14px; color: var(--text-soft); font-weight: 500; }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  z-index: 300; display: none; align-items: flex-end;
+}
+.modal-overlay.open { display: flex; }
+.modal-sheet {
+  background: var(--white); border-radius: 24px 24px 0 0;
+  width: 100%; max-height: 85vh; overflow-y: auto;
+  padding: 8px 20px calc(var(--safe-bottom) + 20px);
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-handle { width: 40px; height: 4px; background: #D1D5DB; border-radius: 2px; margin: 12px auto 20px; }
+.modal-title { font-size: 18px; font-weight: 800; margin-bottom: 16px; }
+.modal-close {
+  position: absolute; right: 20px; top: 20px;
+  width: 32px; height: 32px; border-radius: 16px;
+  background: #F3F4F6; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+.detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.detail-row:last-child { border-bottom: none; }
+.detail-label { font-size: 13px; color: var(--text-soft); font-weight: 600; }
+.detail-value { font-size: 13px; font-weight: 700; color: var(--text); text-align: right; max-width: 60%; }
+.btn-danger {
+  width: 100%; padding: 14px;
+  background: #FEE2E2; color: #DC2626;
+  border: none; border-radius: var(--radius-sm);
+  font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700;
+  cursor: pointer; margin-top: 10px;
+}
+
+/* EXPORT BUTTON */
+.export-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 14px;
+  background: var(--white); color: var(--green-deep);
+  border: 1.5px solid var(--green-light); border-radius: var(--radius-sm);
+  font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700;
+  cursor: pointer; margin-top: 10px;
+}
+
+/* FILTER CHIPS */
+.filter-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; }
+.filter-row::-webkit-scrollbar { display: none; }
+.filter-chip {
+  flex-shrink: 0; padding: 7px 14px;
+  border-radius: 20px; border: 1.5px solid var(--border);
+  background: var(--white); color: var(--text-mid);
+  font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700;
+  cursor: pointer; white-space: nowrap; transition: all 0.15s;
+}
+.filter-chip.active { background: var(--green-pale); border-color: var(--green-mid); color: var(--green-deep); }
+
+/* ANIMATIONS */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.page.active { animation: fadeIn 0.25s ease; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="app-header">
+  <div class="app-header-brand">
+    <div class="app-header-logo">🌿</div>
+    <div>
+      <div class="app-header-title">OstéoPMI</div>
+      <div class="app-header-sub">PMI Montravel — 1000 Premiers Jours</div>
+    </div>
+  </div>
+  <div class="header-date-badge" id="headerDate"></div>
+</header>
+
+<!-- MAIN -->
+<main class="main-content">
+
+  <!-- PAGE: SAISIE -->
+  <div id="page-saisie" class="page active">
+
+    <!-- Identité -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon green">📝</div>
+        <div>
+          <div class="card-title">Nouvelle séance</div>
+          <div class="card-subtitle">Floriane Guilbaud, D.O.</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">📅 Date <span class="required">*</span></div>
+        <input type="date" class="form-input" id="f-date">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <div class="form-label">Nom <span class="required">*</span></div>
+          <input type="text" class="form-input" id="f-nom" placeholder="NOM">
+        </div>
+        <div class="form-group">
+          <div class="form-label">Prénom <span class="required">*</span></div>
+          <input type="text" class="form-input" id="f-prenom" placeholder="Prénom">
+        </div>
+      </div>
+    </div>
+
+    <!-- Statut séance -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon green">🏥</div>
+        <div>
+          <div class="card-title">Statut de la séance</div>
+        </div>
+      </div>
+      <div class="statut-grid" id="statut-grid">
+        <button class="statut-chip" data-val="Réalisée" onclick="selectStatut(this)">
+          <span class="chip-emoji">✅</span>Réalisée
+        </button>
+        <button class="statut-chip" data-val="Absence non excusée" onclick="selectStatut(this)">
+          <span class="chip-emoji">❌</span>Absence non excusée
+        </button>
+        <button class="statut-chip" data-val="Absence excusée" onclick="selectStatut(this)">
+          <span class="chip-emoji">⚠️</span>Absence excusée
+        </button>
+        <button class="statut-chip" data-val="Report" onclick="selectStatut(this)">
+          <span class="chip-emoji">🔄</span>Report
+        </button>
+      </div>
+    </div>
+
+    <!-- Type consultation + patient -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon rose">👤</div>
+        <div>
+          <div class="card-title">Consultation</div>
+          <div class="card-subtitle">Choisir TYPE PATIENT en premier</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">Type de consultation</div>
+        <select class="form-select" id="f-typeConsult">
+          <option value="">— Choisir —</option>
+          <option>Première consultation</option>
+          <option>Consultation de suivi</option>
+          <option>Bilan de fin</option>
+          <option>Urgence</option>
+        </select>
+      </div>
+
+      <div class="section-divider">
+        <div class="section-divider-line"></div>
+        <div class="section-divider-label">▶ TYPE PATIENT — débloque les menus suivants</div>
+        <div class="section-divider-line"></div>
+      </div>
+
+      <div class="chip-group" id="typePatient-group">
+        <button class="chip" data-val="Femme enceinte" onclick="selectTypePatient(this)">🤰 Femme enceinte</button>
+        <button class="chip" data-val="Post-partum" onclick="selectTypePatient(this)">🌸 Post-partum</button>
+        <button class="chip" data-val="Nourrisson" onclick="selectTypePatient(this)">👶 Nourrisson</button>
+      </div>
+
+      <div class="form-group" style="margin-top:16px">
+        <div class="form-label">Précision <span class="required">*</span></div>
+        <select class="form-select" id="f-precision" disabled>
+          <option value="">— Choisir TYPE PATIENT d'abord —</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Motifs -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon amber">🩺</div>
+        <div>
+          <div class="card-title">Motifs de consultation</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">Motif principal <span class="required">*</span></div>
+        <select class="form-select" id="f-motifPrincipal" disabled>
+          <option value="">— Choisir TYPE PATIENT d'abord —</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">Motif secondaire</div>
+        <select class="form-select" id="f-motifSecondaire" disabled>
+          <option value="">— Optionnel —</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- EVA -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon green">📊</div>
+        <div>
+          <div class="card-title">Évaluation douleur (EVA)</div>
+          <div class="card-subtitle">0 = aucune douleur · 10 = douleur max</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">EVA Entrée (avant séance)</div>
+        <div class="eva-container">
+          <div class="eva-display">
+            <div class="eva-value" id="eva-entree-display">—</div>
+            <div class="eva-label" id="eva-entree-label">Non renseigné</div>
+          </div>
+          <input type="range" class="eva-slider" id="f-evaEntree" min="0" max="10" step="1" value="0" oninput="updateEva('entree', this.value)" onchange="updateEva('entree', this.value)">
+          <div class="eva-scale">
+            <span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="chip" onclick="clearEva('entree')" style="font-size:12px;padding:6px 12px">✕ Non renseigné</button>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top:8px">
+        <div class="form-label">EVA Sortie (après séance)</div>
+        <div class="eva-container">
+          <div class="eva-display">
+            <div class="eva-value" id="eva-sortie-display">—</div>
+            <div class="eva-label" id="eva-sortie-label">Non renseigné</div>
+          </div>
+          <input type="range" class="eva-slider" id="f-evaSortie" min="0" max="10" step="1" value="0" oninput="updateEva('sortie', this.value)" onchange="updateEva('sortie', this.value)">
+          <div class="eva-scale">
+            <span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="chip" onclick="clearEva('sortie')" style="font-size:12px;padding:6px 12px">✕ Non renseigné</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compléments -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon rose">📋</div>
+        <div><div class="card-title">Informations complémentaires</div></div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">Allaitement</div>
+        <div class="chip-group">
+          <button class="chip" data-val="Oui" onclick="selectChip('allaitement', this)">✓ Oui</button>
+          <button class="chip" data-val="Non" onclick="selectChip('allaitement', this)">✗ Non</button>
+          <button class="chip" data-val="NA" onclick="selectChip('allaitement', this)">N/A</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">Orientation par</div>
+        <select class="form-select" id="f-orientation">
+          <option value="">— Aucune / Directe —</option>
+          <option>Sage-femme</option>
+          <option>Médecin PMI</option>
+          <option>Gynécologue-obstétricien</option>
+          <option>Pédiatre</option>
+          <option>Maternité</option>
+          <option>Médecin traitant</option>
+          <option>Bouche-à-oreille</option>
+          <option>Autre professionnel</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">Notes libres</div>
+        <textarea class="form-textarea" id="f-notes" placeholder="Observations, remarques, transmissions…"></textarea>
+      </div>
+    </div>
+
+    <!-- Situation à risque -->
+    <div class="card">
+      <div class="risk-toggle" id="risk-toggle" onclick="toggleRisk()">
+        <div class="risk-label">
+          <span style="font-size:20px">⚠️</span>
+          <div>
+            <div class="risk-label-text">Situation à risque détectée</div>
+            <div class="risk-sub">Confidentiel — Suivi renforcé requis</div>
+          </div>
+        </div>
+        <div class="toggle-switch" id="risk-switch">
+          <div class="toggle-knob"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBMIT -->
+    <button class="btn-primary" onclick="submitForm()">💾 Enregistrer la séance</button>
+    <button class="btn-secondary" onclick="clearForm()">🗑 Effacer le formulaire</button>
+    <div style="height:8px"></div>
+  </div>
+
+  <!-- PAGE: PATIENTS -->
+  <div id="page-patients" class="page">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Rechercher un patient…" oninput="filterPatients(this.value)" id="search-input">
+    </div>
+
+    <div class="filter-row">
+      <button class="filter-chip active" data-filter="all" onclick="setFilter(this,'all')">Tous</button>
+      <button class="filter-chip" data-filter="Femme enceinte" onclick="setFilter(this,'Femme enceinte')">🤰 Femme enceinte</button>
+      <button class="filter-chip" data-filter="Post-partum" onclick="setFilter(this,'Post-partum')">🌸 Post-partum</button>
+      <button class="filter-chip" data-filter="Nourrisson" onclick="setFilter(this,'Nourrisson')">👶 Nourrisson</button>
+      <button class="filter-chip" data-filter="risque" onclick="setFilter(this,'risque')">⚠️ Risque</button>
+    </div>
+
+    <div id="patients-list"></div>
+  </div>
+
+  <!-- PAGE: DASHBOARD -->
+  <div id="page-dashboard" class="page">
+
+    <!-- KPIs principaux -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-value" id="kpi-total">0</div>
+        <div class="kpi-label">Séances réalisées</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value" id="kpi-absences" style="color:#EF4444">0</div>
+        <div class="kpi-label">Absences non excusées</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value" id="kpi-taux">—</div>
+        <div class="kpi-label">Taux de présence</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value" id="kpi-risque" style="color:#EF4444">0</div>
+        <div class="kpi-label">Situations à risque</div>
+      </div>
+    </div>
+
+    <!-- Objectif 250 séances -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon green">🎯</div>
+        <div>
+          <div class="card-title">Objectif annuel</div>
+          <div class="card-subtitle" id="objectif-label">0 / 250 séances réalisées</div>
+        </div>
+      </div>
+      <div class="progress-bar-container">
+        <div class="progress-track">
+          <div class="progress-fill" id="objectif-fill" style="width:0%"></div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text-soft);margin-top:6px;font-weight:600" id="objectif-pct">0%</div>
+    </div>
+
+    <!-- EVA Impact clinique -->
+    <div class="eva-impact-card">
+      <div class="eva-impact-title">📉 Impact clinique — Réduction douleur (EVA)</div>
+      <div class="eva-impact-grid">
+        <div>
+          <div class="eva-impact-val" id="db-eva-entree">—</div>
+          <div class="eva-impact-label">EVA MOY. ENTRÉE</div>
+        </div>
+        <div>
+          <div class="eva-impact-val" id="db-eva-sortie">—</div>
+          <div class="eva-impact-label">EVA MOY. SORTIE</div>
+        </div>
+        <div>
+          <div class="eva-impact-val" id="db-eva-delta">—</div>
+          <div class="eva-impact-label">RÉDUCTION</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Répartition types patients -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon green">👥</div>
+        <div><div class="card-title">Répartition par type patient</div></div>
+      </div>
+      <div class="bar-list" id="db-types"></div>
+    </div>
+
+    <!-- Top motifs -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon rose">🩺</div>
+        <div><div class="card-title">Top 5 motifs principaux</div></div>
+      </div>
+      <div class="bar-list" id="db-motifs"></div>
+    </div>
+
+    <!-- Statuts -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon amber">📊</div>
+        <div><div class="card-title">Statuts des séances</div></div>
+      </div>
+      <div class="bar-list" id="db-statuts"></div>
+    </div>
+
+    <button class="export-btn" onclick="exportCSV()">📤 Exporter les données (CSV)</button>
+    <div style="height:8px"></div>
+  </div>
+
+  <!-- PAGE: GUIDE -->
+  <div id="page-guide" class="page">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon green">📱</div>
+        <div>
+          <div class="card-title">Étapes de saisie iPhone</div>
+        </div>
+      </div>
+      <div>
+        <div class="guide-step"><div class="step-num">1</div><div><div class="step-text">Saisir la DATE</div><div class="step-hint">Pré-remplie avec aujourd'hui</div></div></div>
+        <div class="guide-step"><div class="step-num">2</div><div><div class="step-text">Saisir NOM et PRÉNOM du patient</div></div></div>
+        <div class="guide-step"><div class="step-num">3</div><div><div class="step-text">Sélectionner le STATUT de la séance</div><div class="step-hint">✅ Réalisée · ❌ Absence · ⚠️ Excusée · 🔄 Report</div></div></div>
+        <div class="guide-step"><div class="step-num">4</div><div><div class="step-text">Choisir TYPE CONSULTATION</div></div></div>
+        <div class="guide-step"><div class="step-num">5</div><div><div class="step-text">► Choisir TYPE PATIENT en premier ◄</div><div class="step-hint">Débloque les menus PRÉCISION et MOTIFS</div></div></div>
+        <div class="guide-step"><div class="step-num">6</div><div><div class="step-text">Sélectionner PRÉCISION</div><div class="step-hint">Trimestre / âge bébé / phase post-partum</div></div></div>
+        <div class="guide-step"><div class="step-num">7</div><div><div class="step-text">Sélectionner MOTIF PRINCIPAL</div><div class="step-hint">Liste adaptée au type patient</div></div></div>
+        <div class="guide-step"><div class="step-num">8</div><div><div class="step-text">Motif secondaire si besoin</div></div></div>
+        <div class="guide-step"><div class="step-num">9</div><div><div class="step-text">EVA ENTRÉE avant la séance</div><div class="step-hint">0 = pas de douleur · 10 = douleur maximale</div></div></div>
+        <div class="guide-step"><div class="step-num">10</div><div><div class="step-text">EVA SORTIE à la fin de la séance</div></div></div>
+        <div class="guide-step"><div class="step-num">11</div><div><div class="step-text">Renseigner ALLAITEMENT et ORIENTATION</div></div></div>
+        <div class="guide-step"><div class="step-num">12</div><div><div class="step-text">Cocher SITUATION À RISQUE si détectée</div><div class="step-hint">Confidentiel</div></div></div>
+        <div class="guide-step"><div class="step-num">13</div><div><div class="step-text">Notes libres optionnelles</div></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon amber">🗂</div>
+        <div>
+          <div class="card-title">Référentiel des motifs</div>
+          <div class="card-subtitle">Menus cascadants par type patient</div>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="motif-table">
+          <thead>
+            <tr><th>🤰 Femme enceinte</th><th>🌸 Post-partum</th><th>👶 Nourrisson</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Lombalgies</td><td>Douleurs post-partum immédiates</td><td>Plagiocéphalie positionnelle</td></tr>
+            <tr><td>Sciatalgies</td><td>Cicatrice épisiotomie</td><td>Torticolis</td></tr>
+            <tr><td>Douleurs pelviennes</td><td>Cicatrice césarienne</td><td>Rotation préférentielle de tête</td></tr>
+            <tr><td>Symphyse pubienne</td><td>Réhabilitation périnéale</td><td>Coliques</td></tr>
+            <tr><td>Cervicalgies</td><td>Lombalgies persistantes</td><td>Reflux gastro-oesophagien</td></tr>
+            <tr><td>Troubles digestifs / nausées</td><td>Cervicalgies (portage)</td><td>Troubles du sommeil</td></tr>
+            <tr><td>Constipation</td><td>Douleurs dorsales (allaitement)</td><td>Difficultés allaitement / succion</td></tr>
+            <tr><td>Adaptation posturale précoce</td><td>Réappropriation corporelle</td><td>Hyperextension vertébrale</td></tr>
+            <tr><td>Douleurs ligamentaires</td><td>Diastasis abdominal</td><td>Bilan post-naissance</td></tr>
+            <tr><td>Mobilité diaphragmatique</td><td>Fatigue physique / récupération</td><td>Retard neuro-moteur</td></tr>
+            <tr><td>Préparation à l'accouchement</td><td>Dépression post-partum (orientation)</td><td>Asymétries posturales</td></tr>
+            <tr><td>Douleurs costales</td><td>Autre</td><td>Chutes / traumatisme</td></tr>
+            <tr><td>Oedèmes membres inférieurs</td><td>—</td><td>Trouble de la marche</td></tr>
+            <tr><td>Autre</td><td>—</td><td>Autre</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon green">📲</div>
+        <div><div class="card-title">Installer sur l'écran d'accueil</div></div>
+      </div>
+      <div class="guide-step"><div class="step-num">1</div><div><div class="step-text">Ouvrir cette page dans Safari</div></div></div>
+      <div class="guide-step"><div class="step-num">2</div><div><div class="step-text">Appuyer sur l'icône Partager <span style="font-size:16px">⬆️</span></div></div></div>
+      <div class="guide-step"><div class="step-num">3</div><div><div class="step-text">Choisir "Sur l'écran d'accueil"</div></div></div>
+      <div class="guide-step"><div class="step-num">4</div><div><div class="step-text">Appuyer "Ajouter"</div><div class="step-hint">L'app apparaît comme une vraie app, fonctionne hors ligne</div></div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon amber">ℹ️</div>
+        <div><div class="card-title">À propos</div></div>
+      </div>
+      <div class="detail-row"><div class="detail-label">Ostéopathe</div><div class="detail-value">Floriane GUILBAUD, D.O.</div></div>
+      <div class="detail-row"><div class="detail-label">Structure</div><div class="detail-value">PMI Montravel</div></div>
+      <div class="detail-row"><div class="detail-label">Programme</div><div class="detail-value">1000 Premiers Jours</div></div>
+      <div class="detail-row"><div class="detail-label">Données</div><div class="detail-value">Stockage local iPhone (privé)</div></div>
+      <div class="detail-row"><div class="detail-label">Version</div><div class="detail-value">v2.0 — 2025</div></div>
+    </div>
+    <div style="height:8px"></div>
+  </div>
+</main>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="nav-saisie" onclick="switchPage('saisie')">
+    <div class="nav-icon">📋</div>
+    <div class="nav-label">Saisie</div>
+    <div class="nav-dot"></div>
+  </button>
+  <button class="nav-btn" id="nav-patients" onclick="switchPage('patients')">
+    <div class="nav-icon">👥</div>
+    <div class="nav-label">Patients</div>
+  </button>
+  <button class="nav-btn" id="nav-dashboard" onclick="switchPage('dashboard')">
+    <div class="nav-icon">📈</div>
+    <div class="nav-label">Tableau de bord</div>
+  </button>
+  <button class="nav-btn" id="nav-guide" onclick="switchPage('guide')">
+    <div class="nav-icon">📖</div>
+    <div class="nav-label">Guide</div>
+  </button>
+</nav>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal-sheet" id="modal-sheet">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title" id="modal-title"></div>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script>
+// ========= DATA LAYER =========
+const STORAGE_KEY = 'osteo_pmi_seances_v2';
+
+function loadData() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch(e) { return []; }
+}
+function saveData(data) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+function getData() { return loadData(); }
+
+// ========= REFERENCE DATA =========
+const PRECISIONS = {
+  'Femme enceinte': ['1er trimestre (sem. 1-13)', '2ème trimestre (sem. 14-26)', '3ème trimestre (sem. 27-40)', '9ème mois – préparation accouchement'],
+  'Post-partum': ['0-6 semaines post-partum', '2-3 mois post-partum', '4-6 mois post-partum', 'Plus de 6 mois post-partum'],
+  'Nourrisson': ['0-1 mois', '1-3 mois', '3-6 mois', '6-12 mois', '12-24 mois', '24-36 mois (prématuré, âge corrigé)']
+};
+const MOTIFS = {
+  'Femme enceinte': ['Lombalgies','Sciatalgies','Douleurs pelviennes','Symphyse pubienne','Cervicalgies','Troubles digestifs / nausées','Constipation','Adaptation posturale précoce','Douleurs ligamentaires','Mobilité diaphragmatique','Préparation à l\'accouchement','Douleurs costales','Oedèmes membres inférieurs','Autre'],
+  'Post-partum': ['Douleurs post-partum immédiates','Cicatrice épisiotomie','Cicatrice césarienne','Réhabilitation périnéale','Lombalgies persistantes','Cervicalgies (portage)','Douleurs dorsales (allaitement)','Réappropriation corporelle','Diastasis abdominal','Fatigue physique / récupération','Dépression post-partum (orientation)','Autre'],
+  'Nourrisson': ['Plagiocéphalie positionnelle','Torticolis','Rotation préférentielle de tête','Coliques','Reflux gastro-oesophagien','Troubles du sommeil','Difficultés allaitement / succion','Hyperextension vertébrale','Bilan post-naissance','Retard neuro-moteur','Asymétries posturales','Chutes / traumatisme','Trouble de la marche','Autre']
+};
+const STATUT_CLASS = {'Réalisée':'active-green','Absence non excusée':'active-red','Absence excusée':'active-amber','Report':'active-blue'};
+
+// ========= FORM STATE =========
+let formState = { statut: null, typePatient: null, allaitement: null, evaEntree: null, evaSortie: null, risk: false };
+
+// ========= INIT =========
+document.addEventListener('DOMContentLoaded', () => {
+  // Set today's date
+  const today = new Date();
+  document.getElementById('f-date').value = today.toISOString().split('T')[0];
+  document.getElementById('headerDate').textContent = today.toLocaleDateString('fr-FR', {day:'numeric',month:'short',year:'numeric'});
+  
+  // Init EVA displays
+  clearEva('entree'); clearEva('sortie');
+});
+
+// ========= NAVIGATION =========
+let currentPage = 'saisie';
+function switchPage(page) {
+  document.querySelector('.page.active')?.classList.remove('active');
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    b.classList.remove('active');
+    const dot = b.querySelector('.nav-dot');
+    if (dot) dot.remove();
+  });
+  const activeBtn = document.getElementById('nav-' + page);
+  activeBtn.classList.add('active');
+  if (!activeBtn.querySelector('.nav-dot')) {
+    const dot = document.createElement('div');
+    dot.className = 'nav-dot';
+    activeBtn.appendChild(dot);
+  }
+  currentPage = page;
+  if (page === 'patients') renderPatients();
+  if (page === 'dashboard') renderDashboard();
+}
+
+// ========= FORM =========
+function selectStatut(btn) {
+  document.querySelectorAll('.statut-chip').forEach(c => { c.className = 'statut-chip'; });
+  const cls = STATUT_CLASS[btn.dataset.val];
+  btn.classList.add(cls);
+  formState.statut = btn.dataset.val;
+}
+
+function selectTypePatient(btn) {
+  document.querySelectorAll('#typePatient-group .chip').forEach(c => c.classList.remove('selected'));
+  btn.classList.add('selected');
+  formState.typePatient = btn.dataset.val;
+  updateCascadingMenus(btn.dataset.val);
+}
+
+function updateCascadingMenus(type) {
+  const precSel = document.getElementById('f-precision');
+  const motifPSel = document.getElementById('f-motifPrincipal');
+  const motifSSel = document.getElementById('f-motifSecondaire');
+
+  precSel.disabled = false;
+  motifPSel.disabled = false;
+  motifSSel.disabled = false;
+
+  precSel.innerHTML = '<option value="">— Choisir —</option>';
+  motifPSel.innerHTML = '<option value="">— Choisir —</option>';
+  motifSSel.innerHTML = '<option value="">— Optionnel —</option>';
+
+  (PRECISIONS[type] || []).forEach(p => { precSel.innerHTML += `<option>${p}</option>`; });
+  (MOTIFS[type] || []).forEach(m => {
+    motifPSel.innerHTML += `<option>${m}</option>`;
+    motifSSel.innerHTML += `<option>${m}</option>`;
+  });
+}
+
+function selectChip(group, btn) {
+  if (group === 'allaitement') {
+    document.querySelectorAll('[onclick*="allaitement"]').forEach(c => { c.classList.remove('selected'); });
+    btn.classList.add('selected');
+    formState.allaitement = btn.dataset.val;
+  }
+}
+
+function updateEva(type, val) {
+  formState['eva' + (type === 'entree' ? 'Entree' : 'Sortie')] = parseInt(val);
+  const disp = document.getElementById('eva-' + type + '-display');
+  const lbl = document.getElementById('eva-' + type + '-label');
+  const v = parseInt(val);
+  disp.textContent = v;
+  const colors = ['#059669','#059669','#10B981','#34D399','#FCD34D','#F59E0B','#FB923C','#F97316','#EF4444','#DC2626','#B91C1C'];
+  const bgs = ['#D1FAE5','#D1FAE5','#D1FAE5','#D1FAE5','#FEF3C7','#FEF3C7','#FFEDD5','#FFEDD5','#FEE2E2','#FEE2E2','#FEE2E2'];
+  const labels = ['Aucune douleur','Très légère','Légère','Légère à modérée','Modérée','Modérée','Intense','Intense','Très intense','Sévère','Douleur maximale'];
+  disp.style.background = bgs[v];
+  disp.style.color = colors[v];
+  lbl.textContent = labels[v];
+  // Update slider track
+  const slider = document.getElementById('f-eva' + (type === 'entree' ? 'Entree' : 'Sortie'));
+  const pct = v / 10 * 100;
+  slider.style.background = `linear-gradient(to right, ${colors[v]} ${pct}%, #E5E7EB ${pct}%)`;
+}
+
+function clearEva(type) {
+  formState['eva' + (type === 'entree' ? 'Entree' : 'Sortie')] = null;
+  const disp = document.getElementById('eva-' + type + '-display');
+  const lbl = document.getElementById('eva-' + type + '-label');
+  disp.textContent = '—';
+  disp.style.background = '#F3F4F6';
+  disp.style.color = '#9CA3AF';
+  lbl.textContent = 'Non renseigné';
+  const slider = document.getElementById('f-eva' + (type === 'entree' ? 'Entree' : 'Sortie'));
+  slider.value = 0;
+  slider.style.background = '#E5E7EB';
+}
+
+function toggleRisk() {
+  formState.risk = !formState.risk;
+  const sw = document.getElementById('risk-switch');
+  const tgl = document.getElementById('risk-toggle');
+  sw.classList.toggle('on', formState.risk);
+  tgl.classList.toggle('active', formState.risk);
+}
+
+function submitForm() {
+  const nom = document.getElementById('f-nom').value.trim();
+  const prenom = document.getElementById('f-prenom').value.trim();
+  const date = document.getElementById('f-date').value;
+
+  if (!nom || !prenom) { showToast('Nom et prénom requis', 'error'); return; }
+  if (!formState.statut) { showToast('Sélectionner un statut de séance', 'error'); return; }
+  if (!formState.typePatient) { showToast('Sélectionner le type de patient', 'error'); return; }
+
+  const record = {
+    id: Date.now().toString(),
+    date,
+    nom: nom.toUpperCase(),
+    prenom,
+    statut: formState.statut,
+    typeConsult: document.getElementById('f-typeConsult').value,
+    typePatient: formState.typePatient,
+    precision: document.getElementById('f-precision').value,
+    motifPrincipal: document.getElementById('f-motifPrincipal').value,
+    motifSecondaire: document.getElementById('f-motifSecondaire').value,
+    evaEntree: formState.evaEntree,
+    evaSortie: formState.evaSortie,
+    deltaEva: (formState.evaEntree !== null && formState.evaSortie !== null) ? formState.evaEntree - formState.evaSortie : null,
+    allaitement: formState.allaitement || '',
+    orientation: document.getElementById('f-orientation').value,
+    situationRisque: formState.risk,
+    notes: document.getElementById('f-notes').value.trim()
+  };
+
+  const data = loadData();
+  data.unshift(record);
+  saveData(data);
+  showToast('✅ Séance enregistrée', 'success');
+  clearForm();
+}
+
+function clearForm() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('f-date').value = today;
+  document.getElementById('f-nom').value = '';
+  document.getElementById('f-prenom').value = '';
+  document.getElementById('f-typeConsult').value = '';
+  document.getElementById('f-precision').innerHTML = '<option value="">— Choisir TYPE PATIENT d\'abord —</option>';
+  document.getElementById('f-precision').disabled = true;
+  document.getElementById('f-motifPrincipal').innerHTML = '<option value="">— Choisir TYPE PATIENT d\'abord —</option>';
+  document.getElementById('f-motifPrincipal').disabled = true;
+  document.getElementById('f-motifSecondaire').innerHTML = '<option value="">— Optionnel —</option>';
+  document.getElementById('f-motifSecondaire').disabled = true;
+  document.getElementById('f-orientation').value = '';
+  document.getElementById('f-notes').value = '';
+  
+  document.querySelectorAll('.statut-chip').forEach(c => c.className = 'statut-chip');
+  document.querySelectorAll('#typePatient-group .chip').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('[onclick*="allaitement"]').forEach(c => c.classList.remove('selected'));
+  
+  formState = { statut: null, typePatient: null, allaitement: null, evaEntree: null, evaSortie: null, risk: false };
+  clearEva('entree'); clearEva('sortie');
+  document.getElementById('risk-switch').classList.remove('on');
+  document.getElementById('risk-toggle').classList.remove('active');
+}
+
+// ========= PATIENTS LIST =========
+let currentFilter = 'all';
+let searchQuery = '';
+
+function setFilter(btn, filter) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  currentFilter = filter;
+  renderPatients();
+}
+
+function filterPatients(q) {
+  searchQuery = q.toLowerCase();
+  renderPatients();
+}
+
+function renderPatients() {
+  let data = loadData();
+  
+  if (currentFilter !== 'all') {
+    if (currentFilter === 'risque') data = data.filter(r => r.situationRisque);
+    else data = data.filter(r => r.typePatient === currentFilter);
+  }
+  if (searchQuery) {
+    data = data.filter(r => (r.nom + ' ' + r.prenom).toLowerCase().includes(searchQuery));
+  }
+
+  const container = document.getElementById('patients-list');
+  if (data.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">🌿</div><div class="empty-title">Aucune séance</div><div class="empty-sub">Les séances enregistrées apparaîtront ici</div></div>`;
+    return;
+  }
+
+  const avatarMap = { 'Femme enceinte': ['🤰','avatar-green'], 'Post-partum': ['🌸','avatar-rose'], 'Nourrisson': ['👶','avatar-amber'] };
+  const statBadge = { 'Réalisée': ['✅','badge-green'], 'Absence non excusée': ['❌','badge-red'], 'Absence excusée': ['⚠️','badge-amber'], 'Report': ['🔄','badge-blue'] };
+
+  container.innerHTML = data.map(r => {
+    const [ava, avaCls] = avatarMap[r.typePatient] || ['👤','avatar-green'];
+    const [sEmoji, sBadge] = statBadge[r.statut] || ['','badge-gray'];
+    const dateStr = r.date ? new Date(r.date).toLocaleDateString('fr-FR', {day:'numeric',month:'short'}) : '';
+    let evaHtml = '';
+    if (r.evaEntree !== null && r.evaSortie !== null) {
+      const delta = r.evaEntree - r.evaSortie;
+      evaHtml = `<div class="eva-mini"><span>${r.evaEntree}</span><span class="eva-arrow">→</span><span>${r.evaSortie}</span></div><div class="delta-positive">${delta > 0 ? '-' + delta : delta < 0 ? '+' + Math.abs(delta) : '='}</div>`;
+    }
+    const riskBadge = r.situationRisque ? `<span class="badge badge-risk">⚠️ Risque</span>` : '';
+    return `<div class="patient-item" onclick="showDetail('${r.id}')">
+      <div class="patient-avatar ${avaCls}">${ava}</div>
+      <div class="patient-info">
+        <div class="patient-name">${r.nom} ${r.prenom}</div>
+        <div class="patient-detail">${dateStr}${r.motifPrincipal ? ' · ' + r.motifPrincipal : ''}</div>
+        <div class="patient-meta">
+          <span class="badge ${sBadge}">${sEmoji} ${r.statut}</span>
+          <span class="badge badge-gray">${r.typePatient}</span>
+          ${riskBadge}
+        </div>
+      </div>
+      <div class="patient-eva">${evaHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+// ========= DETAIL MODAL =========
+function showDetail(id) {
+  const data = loadData();
+  const r = data.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('modal-title').textContent = r.nom + ' ' + r.prenom;
+  const rows = [
+    ['Date', r.date ? new Date(r.date).toLocaleDateString('fr-FR', {weekday:'long',day:'numeric',month:'long',year:'numeric'}) : '—'],
+    ['Statut', r.statut],
+    ['Type patient', r.typePatient],
+    ['Type consultation', r.typeConsult || '—'],
+    ['Précision', r.precision || '—'],
+    ['Motif principal', r.motifPrincipal || '—'],
+    ['Motif secondaire', r.motifSecondaire || '—'],
+    ['EVA entrée', r.evaEntree !== null ? r.evaEntree + ' / 10' : '—'],
+    ['EVA sortie', r.evaSortie !== null ? r.evaSortie + ' / 10' : '—'],
+    ['Delta EVA', r.deltaEva !== null ? (r.deltaEva > 0 ? '-' + r.deltaEva : r.deltaEva < 0 ? '+' + Math.abs(r.deltaEva) : '=') : '—'],
+    ['Allaitement', r.allaitement || '—'],
+    ['Orientation par', r.orientation || '—'],
+    ['Situation à risque', r.situationRisque ? '⚠️ OUI' : 'Non'],
+    ['Notes', r.notes || '—']
+  ];
+  document.getElementById('modal-content').innerHTML =
+    rows.map(([l,v]) => `<div class="detail-row"><div class="detail-label">${l}</div><div class="detail-value">${v}</div></div>`).join('') +
+    `<button class="btn-danger" onclick="deleteRecord('${id}')">🗑 Supprimer cette séance</button>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modal-overlay') || e.type === 'click') {
+    document.getElementById('modal-overlay').classList.remove('open');
+  }
+}
+
+function deleteRecord(id) {
+  if (!confirm('Supprimer cette séance ?')) return;
+  const data = loadData().filter(x => x.id !== id);
+  saveData(data);
+  closeModal();
+  renderPatients();
+  showToast('Séance supprimée', 'success');
+}
+
+// ========= DASHBOARD =========
+function renderDashboard() {
+  const data = loadData();
+  const realized = data.filter(r => r.statut === 'Réalisée');
+  const absNE = data.filter(r => r.statut === 'Absence non excusée');
+  const total = data.length;
+  const taux = total > 0 ? Math.round(realized.length / total * 100) : null;
+  const risque = data.filter(r => r.situationRisque).length;
+
+  document.getElementById('kpi-total').textContent = realized.length;
+  document.getElementById('kpi-absences').textContent = absNE.length;
+  document.getElementById('kpi-taux').textContent = taux !== null ? taux + '%' : '—';
+  document.getElementById('kpi-risque').textContent = risque;
+
+  // Objectif 250
+  const pct = Math.min(100, Math.round(realized.length / 250 * 100));
+  document.getElementById('objectif-label').textContent = `${realized.length} / 250 séances réalisées`;
+  document.getElementById('objectif-fill').style.width = pct + '%';
+  document.getElementById('objectif-pct').textContent = pct + '%';
+
+  // EVA
+  const withEva = realized.filter(r => r.evaEntree !== null && r.evaSortie !== null);
+  if (withEva.length > 0) {
+    const avgE = (withEva.reduce((a,r) => a + r.evaEntree, 0) / withEva.length).toFixed(1);
+    const avgS = (withEva.reduce((a,r) => a + r.evaSortie, 0) / withEva.length).toFixed(1);
+    const redPct = avgE > 0 ? Math.round((avgE - avgS) / avgE * 100) : 0;
+    document.getElementById('db-eva-entree').textContent = avgE;
+    document.getElementById('db-eva-sortie').textContent = avgS;
+    document.getElementById('db-eva-delta').textContent = redPct + '%';
+  } else {
+    document.getElementById('db-eva-entree').textContent = '—';
+    document.getElementById('db-eva-sortie').textContent = '—';
+    document.getElementById('db-eva-delta').textContent = '—';
+  }
+
+  // Types
+  const typeCount = {};
+  data.forEach(r => { typeCount[r.typePatient] = (typeCount[r.typePatient] || 0) + 1; });
+  const maxT = Math.max(...Object.values(typeCount), 1);
+  const typeColors = {'Femme enceinte':'bar-green','Post-partum':'bar-rose','Nourrisson':'bar-amber'};
+  document.getElementById('db-types').innerHTML = Object.entries(typeCount).sort((a,b) => b[1]-a[1]).map(([k,v]) =>
+    `<div class="bar-item"><div class="bar-item-header"><span class="bar-item-label">${k}</span><span class="bar-item-val">${v}</span></div><div class="bar-track"><div class="bar-fill ${typeColors[k]||'bar-green'}" style="width:${Math.round(v/maxT*100)}%"></div></div></div>`
+  ).join('') || '<div style="color:var(--text-soft);font-size:13px;padding:8px 0">Aucune donnée</div>';
+
+  // Top motifs
+  const motifCount = {};
+  data.forEach(r => { if (r.motifPrincipal) motifCount[r.motifPrincipal] = (motifCount[r.motifPrincipal] || 0) + 1; });
+  const topMotifs = Object.entries(motifCount).sort((a,b) => b[1]-a[1]).slice(0,5);
+  const maxM = topMotifs.length > 0 ? topMotifs[0][1] : 1;
+  document.getElementById('db-motifs').innerHTML = topMotifs.map(([k,v]) =>
+    `<div class="bar-item"><div class="bar-item-header"><span class="bar-item-label">${k}</span><span class="bar-item-val">${v}</span></div><div class="bar-track"><div class="bar-fill bar-rose" style="width:${Math.round(v/maxM*100)}%"></div></div></div>`
+  ).join('') || '<div style="color:var(--text-soft);font-size:13px;padding:8px 0">Aucune donnée</div>';
+
+  // Statuts
+  const statutCount = {};
+  data.forEach(r => { statutCount[r.statut] = (statutCount[r.statut] || 0) + 1; });
+  const maxS = Math.max(...Object.values(statutCount), 1);
+  const sColors = {'Réalisée':'bar-green','Absence non excusée':'bar-rose','Absence excusée':'bar-amber','Report':'bar-amber'};
+  document.getElementById('db-statuts').innerHTML = Object.entries(statutCount).map(([k,v]) =>
+    `<div class="bar-item"><div class="bar-item-header"><span class="bar-item-label">${k}</span><span class="bar-item-val">${v}</span></div><div class="bar-track"><div class="bar-fill ${sColors[k]||'bar-green'}" style="width:${Math.round(v/maxS*100)}%"></div></div></div>`
+  ).join('') || '<div style="color:var(--text-soft);font-size:13px;padding:8px 0">Aucune donnée</div>';
+}
+
+// ========= EXPORT CSV =========
+function exportCSV() {
+  const data = loadData();
+  if (data.length === 0) { showToast('Aucune donnée à exporter', 'error'); return; }
+  const headers = ['Date','Nom','Prénom','Statut','Type Consultation','Type Patient','Précision','Motif Principal','Motif Secondaire','EVA Entrée','EVA Sortie','Delta EVA','Allaitement','Orientation','Situation Risque','Notes'];
+  const rows = data.map(r => [
+    r.date, r.nom, r.prenom, r.statut, r.typeConsult, r.typePatient, r.precision,
+    r.motifPrincipal, r.motifSecondaire, r.evaEntree ?? '', r.evaSortie ?? '', r.deltaEva ?? '',
+    r.allaitement, r.orientation, r.situationRisque ? 'OUI' : '', r.notes
+  ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(','));
+  const csv = [headers.join(','), ...rows].join('\n');
+  const blob = new Blob(['\uFEFF' + csv], {type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `OsteoPMI_Export_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('📤 Export CSV téléchargé', 'success');
+}
+
+// ========= TOAST =========
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
