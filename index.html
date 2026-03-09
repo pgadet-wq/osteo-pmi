@@ -169,36 +169,6 @@ body {
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .form-hint { font-size: 11px; color: var(--text-soft); margin-top: 4px; font-weight: 500; }
 
-/* EVA SLIDER */
-.eva-container { position: relative; }
-.eva-display {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 10px;
-}
-.eva-value {
-  width: 52px; height: 52px; border-radius: 14px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; font-weight: 800;
-  transition: background 0.3s, color 0.3s;
-}
-.eva-label { font-size: 12px; color: var(--text-soft); font-weight: 600; }
-.eva-slider {
-  -webkit-appearance: none; appearance: none;
-  width: 100%; height: 8px; border-radius: 4px;
-  background: #E5E7EB; outline: none;
-  transition: background 0.3s;
-}
-.eva-slider::-webkit-slider-thumb {
-  -webkit-appearance: none; appearance: none;
-  width: 26px; height: 26px; border-radius: 50%;
-  background: var(--white);
-  border: 3px solid var(--green-mid);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  cursor: pointer;
-}
-.eva-scale { display: flex; justify-content: space-between; margin-top: 4px; }
-.eva-scale span { font-size: 10px; color: var(--text-soft); font-weight: 600; }
-
 /* TOGGLE CHIPS */
 .chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip {
@@ -334,12 +304,6 @@ body {
 .badge-blue { background: #EFF6FF; color: #1D4ED8; }
 .badge-gray { background: #F3F4F6; color: var(--text-mid); }
 .badge-risk { background: #FEE2E2; color: #DC2626; }
-.patient-eva { text-align: right; flex-shrink: 0; }
-.eva-mini { font-size: 11px; color: var(--text-soft); font-weight: 600; }
-.eva-mini span { font-size: 15px; font-weight: 800; color: var(--text); }
-.eva-arrow { font-size: 10px; color: var(--text-soft); margin: 0 2px; }
-.delta-positive { color: var(--green-mid); font-weight: 700; font-size: 12px; }
-
 /* SEARCH */
 .search-box {
   display: flex; align-items: center; gap: 10px;
@@ -384,18 +348,6 @@ body {
 .bar-green { background: linear-gradient(90deg, var(--green-mid), var(--green-light)); }
 .bar-rose { background: linear-gradient(90deg, #E8A8A0, #FBBAB4); }
 .bar-amber { background: linear-gradient(90deg, var(--amber), #F8C98B); }
-
-/* EVA IMPACT */
-.eva-impact-card {
-  background: linear-gradient(135deg, var(--green-deep) 0%, var(--green-mid) 100%);
-  border-radius: var(--radius); padding: 22px; color: var(--white);
-  margin-bottom: 14px;
-}
-.eva-impact-title { font-size: 13px; font-weight: 700; opacity: 0.8; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
-.eva-impact-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center; }
-.eva-impact-val { font-size: 28px; font-weight: 800; line-height: 1; }
-.eva-impact-label { font-size: 10px; font-weight: 600; opacity: 0.7; margin-top: 3px; }
-.eva-divider { width: 1px; background: rgba(255,255,255,0.3); margin: 0 auto; }
 
 /* GUIDE */
 .guide-step {
@@ -576,6 +528,22 @@ body {
         </select>
       </div>
 
+      <div class="form-group" id="numSeance-group" style="display:none">
+        <div class="form-label">Numéro de séance</div>
+        <select class="form-select" id="f-numSeance">
+          <option value="">— Choisir —</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+          <option>5</option>
+          <option>6</option>
+          <option>7</option>
+          <option>8</option>
+          <option>9</option>
+          <option>10+</option>
+        </select>
+      </div>
+
       <div class="section-divider">
         <div class="section-divider-line"></div>
         <div class="section-divider-label">▶ TYPE PATIENT — débloque les menus suivants</div>
@@ -620,50 +588,6 @@ body {
       </div>
     </div>
 
-    <!-- EVA -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-icon green">📊</div>
-        <div>
-          <div class="card-title">Évaluation douleur (EVA)</div>
-          <div class="card-subtitle">0 = aucune douleur · 10 = douleur max</div>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <div class="form-label">EVA Entrée (avant séance)</div>
-        <div class="eva-container">
-          <div class="eva-display">
-            <div class="eva-value" id="eva-entree-display">—</div>
-            <div class="eva-label" id="eva-entree-label">Non renseigné</div>
-          </div>
-          <input type="range" class="eva-slider" id="f-evaEntree" min="0" max="10" step="1" value="0" oninput="updateEva('entree', this.value)" onchange="updateEva('entree', this.value)">
-          <div class="eva-scale">
-            <span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10</span>
-          </div>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:10px">
-          <button class="chip" onclick="clearEva('entree')" style="font-size:12px;padding:6px 12px">✕ Non renseigné</button>
-        </div>
-      </div>
-
-      <div class="form-group" style="margin-top:8px">
-        <div class="form-label">EVA Sortie (après séance)</div>
-        <div class="eva-container">
-          <div class="eva-display">
-            <div class="eva-value" id="eva-sortie-display">—</div>
-            <div class="eva-label" id="eva-sortie-label">Non renseigné</div>
-          </div>
-          <input type="range" class="eva-slider" id="f-evaSortie" min="0" max="10" step="1" value="0" oninput="updateEva('sortie', this.value)" onchange="updateEva('sortie', this.value)">
-          <div class="eva-scale">
-            <span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10</span>
-          </div>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:10px">
-          <button class="chip" onclick="clearEva('sortie')" style="font-size:12px;padding:6px 12px">✕ Non renseigné</button>
-        </div>
-      </div>
-    </div>
 
     <!-- Compléments -->
     <div class="card">
@@ -715,6 +639,11 @@ body {
         <div class="toggle-switch" id="risk-switch">
           <div class="toggle-knob"></div>
         </div>
+      </div>
+      <div class="chip-group" id="risk-types-group" style="display:none;margin-top:14px">
+        <button class="chip" data-val="Violence Conjugale" onclick="toggleRiskType(this)">Violence Conjugale</button>
+        <button class="chip" data-val="Violence Familiale" onclick="toggleRiskType(this)">Violence Familiale</button>
+        <button class="chip" data-val="RSEV" onclick="toggleRiskType(this)">RSEV</button>
       </div>
     </div>
 
@@ -782,24 +711,6 @@ body {
       <div style="font-size:11px;color:var(--text-soft);margin-top:6px;font-weight:600" id="objectif-pct">0%</div>
     </div>
 
-    <!-- EVA Impact clinique -->
-    <div class="eva-impact-card">
-      <div class="eva-impact-title">📉 Impact clinique — Réduction douleur (EVA)</div>
-      <div class="eva-impact-grid">
-        <div>
-          <div class="eva-impact-val" id="db-eva-entree">—</div>
-          <div class="eva-impact-label">EVA MOY. ENTRÉE</div>
-        </div>
-        <div>
-          <div class="eva-impact-val" id="db-eva-sortie">—</div>
-          <div class="eva-impact-label">EVA MOY. SORTIE</div>
-        </div>
-        <div>
-          <div class="eva-impact-val" id="db-eva-delta">—</div>
-          <div class="eva-impact-label">RÉDUCTION</div>
-        </div>
-      </div>
-    </div>
 
     <!-- Répartition types patients -->
     <div class="card">
@@ -850,11 +761,9 @@ body {
         <div class="guide-step"><div class="step-num">6</div><div><div class="step-text">Sélectionner PRÉCISION</div><div class="step-hint">Trimestre / âge bébé / phase post-partum</div></div></div>
         <div class="guide-step"><div class="step-num">7</div><div><div class="step-text">Sélectionner MOTIF PRINCIPAL</div><div class="step-hint">Liste adaptée au type patient</div></div></div>
         <div class="guide-step"><div class="step-num">8</div><div><div class="step-text">Motif secondaire si besoin</div></div></div>
-        <div class="guide-step"><div class="step-num">9</div><div><div class="step-text">EVA ENTRÉE avant la séance</div><div class="step-hint">0 = pas de douleur · 10 = douleur maximale</div></div></div>
-        <div class="guide-step"><div class="step-num">10</div><div><div class="step-text">EVA SORTIE à la fin de la séance</div></div></div>
-        <div class="guide-step"><div class="step-num">11</div><div><div class="step-text">Renseigner ALLAITEMENT et ORIENTATION</div></div></div>
-        <div class="guide-step"><div class="step-num">12</div><div><div class="step-text">Cocher SITUATION À RISQUE si détectée</div><div class="step-hint">Confidentiel</div></div></div>
-        <div class="guide-step"><div class="step-num">13</div><div><div class="step-text">Notes libres optionnelles</div></div></div>
+        <div class="guide-step"><div class="step-num">9</div><div><div class="step-text">Renseigner ALLAITEMENT et ORIENTATION</div></div></div>
+        <div class="guide-step"><div class="step-num">10</div><div><div class="step-text">Cocher SITUATION À RISQUE si détectée</div><div class="step-hint">Violence Conjugale / Violence Familiale / RSEV — multi-sélection possible</div></div></div>
+        <div class="guide-step"><div class="step-num">11</div><div><div class="step-text">Notes libres optionnelles</div></div></div>
       </div>
     </div>
 
@@ -968,7 +877,7 @@ function getData() { return loadData(); }
 const PRECISIONS = {
   'Femme enceinte': ['1er trimestre (sem. 1-13)', '2ème trimestre (sem. 14-26)', '3ème trimestre (sem. 27-40)', '9ème mois – préparation accouchement'],
   'Post-partum': ['0-6 semaines post-partum', '2-3 mois post-partum', '4-6 mois post-partum', 'Plus de 6 mois post-partum'],
-  'Nourrisson': ['0-1 mois', '1-3 mois', '3-6 mois', '6-12 mois', '12-24 mois', '24-36 mois (prématuré, âge corrigé)']
+  'Nourrisson': ['0-1 mois', '1-3 mois', '3-6 mois', '6-9 mois', '9-12 mois', '12-18 mois', '18-24 mois']
 };
 const MOTIFS = {
   'Femme enceinte': ['Lombalgies','Sciatalgies','Douleurs pelviennes','Symphyse pubienne','Cervicalgies','Troubles digestifs / nausées','Constipation','Adaptation posturale précoce','Douleurs ligamentaires','Mobilité diaphragmatique','Préparation à l\'accouchement','Douleurs costales','Oedèmes membres inférieurs','Autre'],
@@ -978,7 +887,7 @@ const MOTIFS = {
 const STATUT_CLASS = {'Réalisée':'active-green','Absence non excusée':'active-red','Absence excusée':'active-amber','Report':'active-blue'};
 
 // ========= FORM STATE =========
-let formState = { statut: null, typePatient: null, allaitement: null, evaEntree: null, evaSortie: null, risk: false };
+let formState = { statut: null, typePatient: null, allaitement: null, risk: false, riskTypes: [] };
 
 // ========= INIT =========
 document.addEventListener('DOMContentLoaded', () => {
@@ -987,8 +896,11 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('f-date').value = today.toISOString().split('T')[0];
   document.getElementById('headerDate').textContent = today.toLocaleDateString('fr-FR', {day:'numeric',month:'short',year:'numeric'});
   
-  // Init EVA displays
-  clearEva('entree'); clearEva('sortie');
+  // Show/hide numSeance based on typeConsult
+  document.getElementById('f-typeConsult').addEventListener('change', function() {
+    document.getElementById('numSeance-group').style.display = this.value === 'Consultation de suivi' ? 'block' : 'none';
+    if (this.value !== 'Consultation de suivi') document.getElementById('f-numSeance').value = '';
+  });
 });
 
 // ========= NAVIGATION =========
@@ -1056,43 +968,27 @@ function selectChip(group, btn) {
   }
 }
 
-function updateEva(type, val) {
-  formState['eva' + (type === 'entree' ? 'Entree' : 'Sortie')] = parseInt(val);
-  const disp = document.getElementById('eva-' + type + '-display');
-  const lbl = document.getElementById('eva-' + type + '-label');
-  const v = parseInt(val);
-  disp.textContent = v;
-  const colors = ['#059669','#059669','#10B981','#34D399','#FCD34D','#F59E0B','#FB923C','#F97316','#EF4444','#DC2626','#B91C1C'];
-  const bgs = ['#D1FAE5','#D1FAE5','#D1FAE5','#D1FAE5','#FEF3C7','#FEF3C7','#FFEDD5','#FFEDD5','#FEE2E2','#FEE2E2','#FEE2E2'];
-  const labels = ['Aucune douleur','Très légère','Légère','Légère à modérée','Modérée','Modérée','Intense','Intense','Très intense','Sévère','Douleur maximale'];
-  disp.style.background = bgs[v];
-  disp.style.color = colors[v];
-  lbl.textContent = labels[v];
-  // Update slider track
-  const slider = document.getElementById('f-eva' + (type === 'entree' ? 'Entree' : 'Sortie'));
-  const pct = v / 10 * 100;
-  slider.style.background = `linear-gradient(to right, ${colors[v]} ${pct}%, #E5E7EB ${pct}%)`;
-}
-
-function clearEva(type) {
-  formState['eva' + (type === 'entree' ? 'Entree' : 'Sortie')] = null;
-  const disp = document.getElementById('eva-' + type + '-display');
-  const lbl = document.getElementById('eva-' + type + '-label');
-  disp.textContent = '—';
-  disp.style.background = '#F3F4F6';
-  disp.style.color = '#9CA3AF';
-  lbl.textContent = 'Non renseigné';
-  const slider = document.getElementById('f-eva' + (type === 'entree' ? 'Entree' : 'Sortie'));
-  slider.value = 0;
-  slider.style.background = '#E5E7EB';
-}
-
 function toggleRisk() {
   formState.risk = !formState.risk;
   const sw = document.getElementById('risk-switch');
   const tgl = document.getElementById('risk-toggle');
   sw.classList.toggle('on', formState.risk);
   tgl.classList.toggle('active', formState.risk);
+  document.getElementById('risk-types-group').style.display = formState.risk ? 'flex' : 'none';
+  if (!formState.risk) {
+    formState.riskTypes = [];
+    document.querySelectorAll('#risk-types-group .chip').forEach(c => c.classList.remove('selected-rose'));
+  }
+}
+
+function toggleRiskType(btn) {
+  const val = btn.dataset.val;
+  btn.classList.toggle('selected-rose');
+  if (formState.riskTypes.includes(val)) {
+    formState.riskTypes = formState.riskTypes.filter(v => v !== val);
+  } else {
+    formState.riskTypes.push(val);
+  }
 }
 
 function submitForm() {
@@ -1111,16 +1007,15 @@ function submitForm() {
     prenom,
     statut: formState.statut,
     typeConsult: document.getElementById('f-typeConsult').value,
+    numSeance: document.getElementById('f-numSeance').value,
     typePatient: formState.typePatient,
     precision: document.getElementById('f-precision').value,
     motifPrincipal: document.getElementById('f-motifPrincipal').value,
     motifSecondaire: document.getElementById('f-motifSecondaire').value,
-    evaEntree: formState.evaEntree,
-    evaSortie: formState.evaSortie,
-    deltaEva: (formState.evaEntree !== null && formState.evaSortie !== null) ? formState.evaEntree - formState.evaSortie : null,
     allaitement: formState.allaitement || '',
     orientation: document.getElementById('f-orientation').value,
     situationRisque: formState.risk,
+    riskTypes: formState.riskTypes,
     notes: document.getElementById('f-notes').value.trim()
   };
 
@@ -1137,6 +1032,8 @@ function clearForm() {
   document.getElementById('f-nom').value = '';
   document.getElementById('f-prenom').value = '';
   document.getElementById('f-typeConsult').value = '';
+  document.getElementById('f-numSeance').value = '';
+  document.getElementById('numSeance-group').style.display = 'none';
   document.getElementById('f-precision').innerHTML = '<option value="">— Choisir TYPE PATIENT d\'abord —</option>';
   document.getElementById('f-precision').disabled = true;
   document.getElementById('f-motifPrincipal').innerHTML = '<option value="">— Choisir TYPE PATIENT d\'abord —</option>';
@@ -1150,10 +1047,11 @@ function clearForm() {
   document.querySelectorAll('#typePatient-group .chip').forEach(c => c.classList.remove('selected'));
   document.querySelectorAll('[onclick*="allaitement"]').forEach(c => c.classList.remove('selected'));
   
-  formState = { statut: null, typePatient: null, allaitement: null, evaEntree: null, evaSortie: null, risk: false };
-  clearEva('entree'); clearEva('sortie');
+  formState = { statut: null, typePatient: null, allaitement: null, risk: false, riskTypes: [] };
   document.getElementById('risk-switch').classList.remove('on');
   document.getElementById('risk-toggle').classList.remove('active');
+  document.getElementById('risk-types-group').style.display = 'none';
+  document.querySelectorAll('#risk-types-group .chip').forEach(c => c.classList.remove('selected-rose'));
 }
 
 // ========= PATIENTS LIST =========
@@ -1196,12 +1094,8 @@ function renderPatients() {
     const [ava, avaCls] = avatarMap[r.typePatient] || ['👤','avatar-green'];
     const [sEmoji, sBadge] = statBadge[r.statut] || ['','badge-gray'];
     const dateStr = r.date ? new Date(r.date).toLocaleDateString('fr-FR', {day:'numeric',month:'short'}) : '';
-    let evaHtml = '';
-    if (r.evaEntree !== null && r.evaSortie !== null) {
-      const delta = r.evaEntree - r.evaSortie;
-      evaHtml = `<div class="eva-mini"><span>${r.evaEntree}</span><span class="eva-arrow">→</span><span>${r.evaSortie}</span></div><div class="delta-positive">${delta > 0 ? '-' + delta : delta < 0 ? '+' + Math.abs(delta) : '='}</div>`;
-    }
     const riskBadge = r.situationRisque ? `<span class="badge badge-risk">⚠️ Risque</span>` : '';
+    const seanceBadge = r.numSeance ? `<span class="badge badge-gray">Séance ${r.numSeance}</span>` : '';
     return `<div class="patient-item" onclick="showDetail('${r.id}')">
       <div class="patient-avatar ${avaCls}">${ava}</div>
       <div class="patient-info">
@@ -1210,10 +1104,10 @@ function renderPatients() {
         <div class="patient-meta">
           <span class="badge ${sBadge}">${sEmoji} ${r.statut}</span>
           <span class="badge badge-gray">${r.typePatient}</span>
+          ${seanceBadge}
           ${riskBadge}
         </div>
       </div>
-      <div class="patient-eva">${evaHtml}</div>
     </div>`;
   }).join('');
 }
@@ -1224,20 +1118,19 @@ function showDetail(id) {
   const r = data.find(x => x.id === id);
   if (!r) return;
   document.getElementById('modal-title').textContent = r.nom + ' ' + r.prenom;
+  const riskDetail = r.situationRisque ? ('⚠️ OUI' + (r.riskTypes && r.riskTypes.length ? ' — ' + r.riskTypes.join(', ') : '')) : 'Non';
   const rows = [
     ['Date', r.date ? new Date(r.date).toLocaleDateString('fr-FR', {weekday:'long',day:'numeric',month:'long',year:'numeric'}) : '—'],
     ['Statut', r.statut],
     ['Type patient', r.typePatient],
     ['Type consultation', r.typeConsult || '—'],
+    ['N° séance', r.numSeance || '—'],
     ['Précision', r.precision || '—'],
     ['Motif principal', r.motifPrincipal || '—'],
     ['Motif secondaire', r.motifSecondaire || '—'],
-    ['EVA entrée', r.evaEntree !== null ? r.evaEntree + ' / 10' : '—'],
-    ['EVA sortie', r.evaSortie !== null ? r.evaSortie + ' / 10' : '—'],
-    ['Delta EVA', r.deltaEva !== null ? (r.deltaEva > 0 ? '-' + r.deltaEva : r.deltaEva < 0 ? '+' + Math.abs(r.deltaEva) : '=') : '—'],
     ['Allaitement', r.allaitement || '—'],
     ['Orientation par', r.orientation || '—'],
-    ['Situation à risque', r.situationRisque ? '⚠️ OUI' : 'Non'],
+    ['Situation à risque', riskDetail],
     ['Notes', r.notes || '—']
   ];
   document.getElementById('modal-content').innerHTML =
@@ -1281,21 +1174,6 @@ function renderDashboard() {
   document.getElementById('objectif-fill').style.width = pct + '%';
   document.getElementById('objectif-pct').textContent = pct + '%';
 
-  // EVA
-  const withEva = realized.filter(r => r.evaEntree !== null && r.evaSortie !== null);
-  if (withEva.length > 0) {
-    const avgE = (withEva.reduce((a,r) => a + r.evaEntree, 0) / withEva.length).toFixed(1);
-    const avgS = (withEva.reduce((a,r) => a + r.evaSortie, 0) / withEva.length).toFixed(1);
-    const redPct = avgE > 0 ? Math.round((avgE - avgS) / avgE * 100) : 0;
-    document.getElementById('db-eva-entree').textContent = avgE;
-    document.getElementById('db-eva-sortie').textContent = avgS;
-    document.getElementById('db-eva-delta').textContent = redPct + '%';
-  } else {
-    document.getElementById('db-eva-entree').textContent = '—';
-    document.getElementById('db-eva-sortie').textContent = '—';
-    document.getElementById('db-eva-delta').textContent = '—';
-  }
-
   // Types
   const typeCount = {};
   data.forEach(r => { typeCount[r.typePatient] = (typeCount[r.typePatient] || 0) + 1; });
@@ -1328,11 +1206,11 @@ function renderDashboard() {
 function exportCSV() {
   const data = loadData();
   if (data.length === 0) { showToast('Aucune donnée à exporter', 'error'); return; }
-  const headers = ['Date','Nom','Prénom','Statut','Type Consultation','Type Patient','Précision','Motif Principal','Motif Secondaire','EVA Entrée','EVA Sortie','Delta EVA','Allaitement','Orientation','Situation Risque','Notes'];
+  const headers = ['Date','Nom','Prénom','Statut','Type Consultation','N° Séance','Type Patient','Précision','Motif Principal','Motif Secondaire','Allaitement','Orientation','Situation Risque','Type Risque','Notes'];
   const rows = data.map(r => [
-    r.date, r.nom, r.prenom, r.statut, r.typeConsult, r.typePatient, r.precision,
-    r.motifPrincipal, r.motifSecondaire, r.evaEntree ?? '', r.evaSortie ?? '', r.deltaEva ?? '',
-    r.allaitement, r.orientation, r.situationRisque ? 'OUI' : '', r.notes
+    r.date, r.nom, r.prenom, r.statut, r.typeConsult, r.numSeance || '', r.typePatient, r.precision,
+    r.motifPrincipal, r.motifSecondaire,
+    r.allaitement, r.orientation, r.situationRisque ? 'OUI' : '', (r.riskTypes || []).join(', '), r.notes
   ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(','));
   const csv = [headers.join(','), ...rows].join('\n');
   const blob = new Blob(['\uFEFF' + csv], {type:'text/csv;charset=utf-8'});
