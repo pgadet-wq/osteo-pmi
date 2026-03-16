@@ -461,7 +461,7 @@ body {
       <div class="card-header">
         <div class="card-icon green">📝</div>
         <div>
-          <div class="card-title">Nouvelle séance</div>
+          <div class="card-title" id="form-title">Nouvelle séance</div>
           <div class="card-subtitle">Floriane Guilbaud, D.O.</div>
         </div>
       </div>
@@ -609,13 +609,14 @@ body {
         <div class="form-label">Orientation par</div>
         <select class="form-select" id="f-orientation">
           <option value="">— Aucune / Directe —</option>
-          <option>Sage-femme</option>
-          <option>Médecin PMI</option>
-          <option>Gynécologue-obstétricien</option>
-          <option>Pédiatre</option>
-          <option>Maternité</option>
-          <option>Médecin traitant</option>
           <option>Bouche-à-oreille</option>
+          <option>Gynécologue-obstétricien</option>
+          <option>Maternité</option>
+          <option>Médecin PMI</option>
+          <option>Médecin traitant</option>
+          <option>Pédiatre</option>
+          <option>Puéricultrice</option>
+          <option>Sage-femme</option>
           <option>Autre professionnel</option>
         </select>
       </div>
@@ -648,8 +649,8 @@ body {
     </div>
 
     <!-- SUBMIT -->
-    <button class="btn-primary" onclick="submitForm()">💾 Enregistrer la séance</button>
-    <button class="btn-secondary" onclick="clearForm()">🗑 Effacer le formulaire</button>
+    <button class="btn-primary" id="btn-submit" onclick="submitForm()">💾 Enregistrer la séance</button>
+    <button class="btn-secondary" id="btn-cancel" onclick="clearForm()">🗑 Effacer le formulaire</button>
     <div style="height:8px"></div>
   </div>
 
@@ -880,14 +881,15 @@ const PRECISIONS = {
   'Nourrisson': ['0-1 mois', '1-3 mois', '3-6 mois', '6-9 mois', '9-12 mois', '12-18 mois', '18-24 mois']
 };
 const MOTIFS = {
-  'Femme enceinte': ['Lombalgies','Sciatalgies','Douleurs pelviennes','Symphyse pubienne','Cervicalgies','Troubles digestifs / nausées','Constipation','Adaptation posturale précoce','Douleurs ligamentaires','Mobilité diaphragmatique','Préparation à l\'accouchement','Douleurs costales','Oedèmes membres inférieurs','Autre'],
-  'Post-partum': ['Douleurs post-partum immédiates','Cicatrice épisiotomie','Cicatrice césarienne','Réhabilitation périnéale','Lombalgies persistantes','Cervicalgies (portage)','Douleurs dorsales (allaitement)','Réappropriation corporelle','Diastasis abdominal','Fatigue physique / récupération','Dépression post-partum (orientation)','Autre'],
-  'Nourrisson': ['Plagiocéphalie positionnelle','Torticolis','Rotation préférentielle de tête','Coliques','Reflux gastro-oesophagien','Troubles du sommeil','Difficultés allaitement / succion','Hyperextension vertébrale','Bilan post-naissance','Retard neuro-moteur','Asymétries posturales','Chutes / traumatisme','Trouble de la marche','Autre']
+  'Femme enceinte': ['Adaptation posturale précoce','Cervicalgies','Constipation','Douleurs costales','Douleurs ligamentaires','Douleurs pelviennes','Lombalgies','Mobilité diaphragmatique','Oedèmes membres inférieurs','Préparation à l\'accouchement','Sciatalgies','Symphyse pubienne','Troubles digestifs / nausées','Autre'],
+  'Post-partum': ['Cervicalgies (portage)','Cicatrice césarienne','Cicatrice épisiotomie','Dépression post-partum (orientation)','Diastasis abdominal','Douleurs dorsales (allaitement)','Douleurs post-partum immédiates','Fatigue physique / récupération','Lombalgies persistantes','Réappropriation corporelle','Réhabilitation périnéale','Autre'],
+  'Nourrisson': ['Asymétries posturales','Bilan post-naissance','Chutes / traumatisme','Coliques','Difficultés allaitement / succion','Hyperextension vertébrale','Plagiocéphalie positionnelle','Reflux gastro-oesophagien','Retard neuro-moteur','Rotation préférentielle de tête','Torticolis','Trouble de la marche','Troubles du sommeil','Autre']
 };
 const STATUT_CLASS = {'Réalisée':'active-green','Absence non excusée':'active-red','Absence excusée':'active-amber','Report':'active-blue'};
 
 // ========= FORM STATE =========
 let formState = { statut: null, typePatient: null, allaitement: null, risk: false, riskTypes: [] };
+let editingId = null;
 
 // ========= INIT =========
 document.addEventListener('DOMContentLoaded', () => {
@@ -954,7 +956,12 @@ function updateCascadingMenus(type) {
   motifSSel.innerHTML = '<option value="">— Optionnel —</option>';
 
   (PRECISIONS[type] || []).forEach(p => { precSel.innerHTML += `<option>${p}</option>`; });
-  (MOTIFS[type] || []).forEach(m => {
+  const motifs = (MOTIFS[type] || []).slice().sort((a, b) => {
+    if (a === 'Autre') return 1;
+    if (b === 'Autre') return -1;
+    return a.localeCompare(b, 'fr');
+  });
+  motifs.forEach(m => {
     motifPSel.innerHTML += `<option>${m}</option>`;
     motifSSel.innerHTML += `<option>${m}</option>`;
   });
@@ -1001,7 +1008,7 @@ function submitForm() {
   if (!formState.typePatient) { showToast('Sélectionner le type de patient', 'error'); return; }
 
   const record = {
-    id: Date.now().toString(),
+    id: editingId || Date.now().toString(),
     date,
     nom: nom.toUpperCase(),
     prenom,
@@ -1019,10 +1026,17 @@ function submitForm() {
     notes: document.getElementById('f-notes').value.trim()
   };
 
-  const data = loadData();
-  data.unshift(record);
-  saveData(data);
-  showToast('✅ Séance enregistrée', 'success');
+  let data = loadData();
+  if (editingId) {
+    const idx = data.findIndex(x => x.id === editingId);
+    if (idx !== -1) data[idx] = record;
+    saveData(data);
+    showToast('✅ Séance modifiée', 'success');
+  } else {
+    data.unshift(record);
+    saveData(data);
+    showToast('✅ Séance enregistrée', 'success');
+  }
   clearForm();
 }
 
@@ -1048,6 +1062,10 @@ function clearForm() {
   document.querySelectorAll('[onclick*="allaitement"]').forEach(c => c.classList.remove('selected'));
   
   formState = { statut: null, typePatient: null, allaitement: null, risk: false, riskTypes: [] };
+  editingId = null;
+  document.getElementById('form-title').textContent = 'Nouvelle séance';
+  document.getElementById('btn-submit').textContent = '💾 Enregistrer la séance';
+  document.getElementById('btn-cancel').textContent = '🗑 Effacer le formulaire';
   document.getElementById('risk-switch').classList.remove('on');
   document.getElementById('risk-toggle').classList.remove('active');
   document.getElementById('risk-types-group').style.display = 'none';
@@ -1135,6 +1153,7 @@ function showDetail(id) {
   ];
   document.getElementById('modal-content').innerHTML =
     rows.map(([l,v]) => `<div class="detail-row"><div class="detail-label">${l}</div><div class="detail-value">${v}</div></div>`).join('') +
+    `<button class="btn-primary" onclick="editRecord('${id}')" style="margin-top:14px">✏️ Modifier cette séance</button>` +
     `<button class="btn-danger" onclick="deleteRecord('${id}')">🗑 Supprimer cette séance</button>`;
   document.getElementById('modal-overlay').classList.add('open');
 }
@@ -1152,6 +1171,83 @@ function deleteRecord(id) {
   closeModal();
   renderPatients();
   showToast('Séance supprimée', 'success');
+}
+
+function editRecord(id) {
+  const data = loadData();
+  const r = data.find(x => x.id === id);
+  if (!r) return;
+
+  closeModal();
+  clearForm();
+  editingId = id;
+
+  // Fill identity fields
+  document.getElementById('f-date').value = r.date || '';
+  document.getElementById('f-nom').value = r.nom || '';
+  document.getElementById('f-prenom').value = r.prenom || '';
+
+  // Statut
+  if (r.statut) {
+    formState.statut = r.statut;
+    document.querySelectorAll('.statut-chip').forEach(c => {
+      if (c.dataset.val === r.statut) { c.classList.add(STATUT_CLASS[r.statut]); }
+    });
+  }
+
+  // Type consultation
+  document.getElementById('f-typeConsult').value = r.typeConsult || '';
+  document.getElementById('numSeance-group').style.display = r.typeConsult === 'Consultation de suivi' ? 'block' : 'none';
+  document.getElementById('f-numSeance').value = r.numSeance || '';
+
+  // Type patient + cascading menus
+  if (r.typePatient) {
+    formState.typePatient = r.typePatient;
+    document.querySelectorAll('#typePatient-group .chip').forEach(c => {
+      if (c.dataset.val === r.typePatient) c.classList.add('selected');
+    });
+    updateCascadingMenus(r.typePatient);
+    document.getElementById('f-precision').value = r.precision || '';
+    document.getElementById('f-motifPrincipal').value = r.motifPrincipal || '';
+    document.getElementById('f-motifSecondaire').value = r.motifSecondaire || '';
+  }
+
+  // Allaitement
+  if (r.allaitement) {
+    formState.allaitement = r.allaitement;
+    document.querySelectorAll('[onclick*="allaitement"]').forEach(c => {
+      if (c.dataset.val === r.allaitement) c.classList.add('selected');
+    });
+  }
+
+  // Orientation
+  document.getElementById('f-orientation').value = r.orientation || '';
+
+  // Notes
+  document.getElementById('f-notes').value = r.notes || '';
+
+  // Situation à risque
+  if (r.situationRisque) {
+    formState.risk = true;
+    document.getElementById('risk-switch').classList.add('on');
+    document.getElementById('risk-toggle').classList.add('active');
+    document.getElementById('risk-types-group').style.display = 'flex';
+    (r.riskTypes || []).forEach(rt => {
+      formState.riskTypes.push(rt);
+      document.querySelectorAll('#risk-types-group .chip').forEach(c => {
+        if (c.dataset.val === rt) c.classList.add('selected-rose');
+      });
+    });
+  }
+
+  // Update UI labels for edit mode
+  document.getElementById('form-title').textContent = 'Modifier la séance';
+  document.getElementById('btn-submit').textContent = '💾 Enregistrer les modifications';
+  document.getElementById('btn-cancel').textContent = '✕ Annuler la modification';
+
+  // Switch to saisie page and scroll to top
+  switchPage('saisie');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ========= DASHBOARD =========
