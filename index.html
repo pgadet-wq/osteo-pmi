@@ -10,6 +10,7 @@
 <title>OstéoPMI — Suivi 1000 Premiers Jours</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Nunito+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 :root {
   --green-deep: #2D6A4F;
@@ -886,7 +887,7 @@ body {
       <div class="detail-row"><div class="detail-label">Structure</div><div class="detail-value">PMI Montravel</div></div>
       <div class="detail-row"><div class="detail-label">Programme</div><div class="detail-value">1000 Premiers Jours</div></div>
       <div class="detail-row"><div class="detail-label">Données</div><div class="detail-value">Stockage local iPhone (privé)</div></div>
-      <div class="detail-row"><div class="detail-label">Version</div><div class="detail-value">v2.1 — 2025</div></div>
+      <div class="detail-row"><div class="detail-label">Version</div><div class="detail-value">v2.2 — 2025</div></div>
     </div>
     <div style="height:8px"></div>
   </div>
@@ -927,7 +928,12 @@ body {
 </div>
 
 <script>
-// ========= DATA LAYER =========
+// ========= SUPABASE =========
+const SUPABASE_URL = 'https://plfqzihbtxlnjpupglsf.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsZnF6aWhidHhsbmpwdXBnbHNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyMDU1MzMsImV4cCI6MjA4OTc4MTUzM30.8nB5e_Xpcc2PcMOZXD03QoKE8AB3i15KXOii4FqdVKk';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ========= DATA LAYER (localStorage + Supabase sync) =========
 const STORAGE_KEY = 'osteo_pmi_seances_v2';
 
 function loadData() {
@@ -938,6 +944,59 @@ function saveData(data) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 function getData() { return loadData(); }
+
+// --- Mapping JS <-> Supabase ---
+function toRow(r) {
+  return {
+    id: r.id, date: r.date || null, nom: r.nom, prenom: r.prenom,
+    statut: r.statut, type_consult: r.typeConsult || '',
+    num_seance: r.numSeance || '', type_patient: r.typePatient,
+    precision_detail: r.precision || '', motif_principal: r.motifPrincipal || '',
+    motif_secondaire: r.motifSecondaire || '', allaitement: r.allaitement || '',
+    orientation: r.orientation || '', situation_risque: !!r.situationRisque,
+    risk_types: r.riskTypes || [], notes: r.notes || ''
+  };
+}
+function fromRow(row) {
+  return {
+    id: row.id, date: row.date, nom: row.nom, prenom: row.prenom,
+    statut: row.statut, typeConsult: row.type_consult,
+    numSeance: row.num_seance, typePatient: row.type_patient,
+    precision: row.precision_detail, motifPrincipal: row.motif_principal,
+    motifSecondaire: row.motif_secondaire, allaitement: row.allaitement,
+    orientation: row.orientation, situationRisque: row.situation_risque,
+    riskTypes: row.risk_types || [], notes: row.notes
+  };
+}
+
+// --- Supabase sync operations ---
+async function dbUpsert(record) {
+  const { error } = await sb.from('seances').upsert(toRow(record));
+  if (error) console.error('Supabase upsert:', error);
+}
+async function dbDelete(id) {
+  const { error } = await sb.from('seances').delete().eq('id', id);
+  if (error) console.error('Supabase delete:', error);
+}
+async function syncFromSupabase() {
+  try {
+    const { data: rows, error } = await sb.from('seances').select('*').order('date', { ascending: false });
+    if (error) throw error;
+    const remote = rows.map(fromRow);
+    const local = loadData();
+    const remoteIds = new Set(remote.map(r => r.id));
+    const localOnly = local.filter(r => !remoteIds.has(r.id));
+    for (const r of localOnly) { await dbUpsert(r); }
+    const merged = [...remote, ...localOnly];
+    merged.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    saveData(merged);
+    if (currentPage === 'patients') renderPatients();
+    if (currentPage === 'dashboard') renderDashboard();
+    if (localOnly.length > 0) showToast(`${localOnly.length} séance(s) synchronisée(s)`, 'success');
+  } catch (e) {
+    console.error('Sync error:', e);
+  }
+}
 
 // ========= REFERENCE DATA =========
 const PRECISIONS = {
@@ -965,6 +1024,9 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Check Monday backup reminder
   checkBackupReminder();
+
+  // Sync with Supabase
+  syncFromSupabase();
 
   // Show/hide numSeance based on typeConsult
   document.getElementById('f-typeConsult').addEventListener('change', function() {
@@ -1105,6 +1167,7 @@ function submitForm() {
     saveData(data);
     showToast('✅ Séance enregistrée', 'success');
   }
+  dbUpsert(record);
   clearForm();
 }
 
@@ -1236,6 +1299,7 @@ function deleteRecord(id) {
   if (!confirm('Supprimer cette séance ?')) return;
   const data = loadData().filter(x => x.id !== id);
   saveData(data);
+  dbDelete(id);
   closeModal();
   renderPatients();
   showToast('Séance supprimée', 'success');
@@ -1487,6 +1551,8 @@ function importBackupJSON(event) {
       });
       existing.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
       saveData(existing);
+      // Sync imported records to Supabase
+      imported.forEach(r => { if (r.id) dbUpsert(r); });
       showToast(`${added} séance(s) importée(s), ${imported.length - added} doublon(s) ignoré(s)`, 'success');
     } catch (err) {
       showToast('Fichier invalide', 'error');
