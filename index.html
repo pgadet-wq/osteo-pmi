@@ -431,6 +431,27 @@ body {
 }
 .filter-chip.active { background: var(--green-pale); border-color: var(--green-mid); color: var(--green-deep); }
 
+/* BACKUP REMINDER BANNER */
+.backup-banner {
+  display: none;
+  margin: 0 16px 14px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #FEF3E2, #FDE8E6);
+  border: 1.5px solid var(--amber);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  animation: fadeIn 0.3s ease;
+}
+.backup-banner-content { display: flex; align-items: center; gap: 12px; }
+.backup-banner-icon { font-size: 24px; flex-shrink: 0; }
+.backup-banner-text { font-size: 13px; font-weight: 700; color: #925F2A; line-height: 1.4; }
+.backup-banner-sub { font-size: 11px; font-weight: 500; color: var(--text-soft); margin-top: 2px; }
+.backup-banner-close {
+  margin-left: auto; flex-shrink: 0;
+  background: none; border: none; font-size: 16px; color: var(--text-soft);
+  cursor: pointer; padding: 4px;
+}
+
 /* ANIMATIONS */
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .page.active { animation: fadeIn 0.25s ease; }
@@ -452,6 +473,18 @@ body {
 
 <!-- MAIN -->
 <main class="main-content">
+
+  <!-- BACKUP REMINDER BANNER (lundi) -->
+  <div class="backup-banner" id="backup-banner" onclick="emailBackupCSV()">
+    <div class="backup-banner-content">
+      <div class="backup-banner-icon">📧</div>
+      <div>
+        <div class="backup-banner-text">C'est lundi — pensez à sauvegarder !</div>
+        <div class="backup-banner-sub">Appuyez pour envoyer le CSV par e-mail</div>
+      </div>
+      <button class="backup-banner-close" onclick="dismissBackupBanner(event)">✕</button>
+    </div>
+  </div>
 
   <!-- PAGE: SAISIE -->
   <div id="page-saisie" class="page active">
@@ -801,6 +834,38 @@ body {
       </div>
     </div>
 
+    <!-- Sauvegarde -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon green">💾</div>
+        <div>
+          <div class="card-title">Sauvegarde des données</div>
+          <div class="card-subtitle" id="backup-status"></div>
+        </div>
+      </div>
+
+      <div style="font-size:13px;color:var(--text-mid);font-weight:500;margin-bottom:14px;line-height:1.5">
+        Les données sont stockées sur cet appareil. Pensez à sauvegarder régulièrement pour éviter toute perte.
+      </div>
+
+      <button class="btn-primary" onclick="emailBackupCSV()" style="margin-bottom:10px">📧 Envoyer la sauvegarde par e-mail (CSV)</button>
+      <button class="export-btn" onclick="exportBackupJSON()">📥 Télécharger une sauvegarde complète (JSON)</button>
+
+      <div class="section-divider">
+        <div class="section-divider-line"></div>
+        <div class="section-divider-label">Restaurer</div>
+        <div class="section-divider-line"></div>
+      </div>
+
+      <div style="font-size:12px;color:var(--text-soft);font-weight:500;margin-bottom:10px">
+        Importer un fichier JSON pour restaurer vos données (fusionne avec les données existantes).
+      </div>
+      <label class="export-btn" style="cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+        📤 Importer une sauvegarde JSON
+        <input type="file" accept=".json" onchange="importBackupJSON(event)" style="display:none">
+      </label>
+    </div>
+
     <div class="card">
       <div class="card-header">
         <div class="card-icon green">📲</div>
@@ -821,7 +886,7 @@ body {
       <div class="detail-row"><div class="detail-label">Structure</div><div class="detail-value">PMI Montravel</div></div>
       <div class="detail-row"><div class="detail-label">Programme</div><div class="detail-value">1000 Premiers Jours</div></div>
       <div class="detail-row"><div class="detail-label">Données</div><div class="detail-value">Stockage local iPhone (privé)</div></div>
-      <div class="detail-row"><div class="detail-label">Version</div><div class="detail-value">v2.0 — 2025</div></div>
+      <div class="detail-row"><div class="detail-label">Version</div><div class="detail-value">v2.1 — 2025</div></div>
     </div>
     <div style="height:8px"></div>
   </div>
@@ -898,6 +963,9 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('f-date').value = today.toISOString().split('T')[0];
   document.getElementById('headerDate').textContent = today.toLocaleDateString('fr-FR', {day:'numeric',month:'short',year:'numeric'});
   
+  // Check Monday backup reminder
+  checkBackupReminder();
+
   // Show/hide numSeance based on typeConsult
   document.getElementById('f-typeConsult').addEventListener('change', function() {
     document.getElementById('numSeance-group').style.display = this.value === 'Consultation de suivi' ? 'block' : 'none';
@@ -1317,6 +1385,152 @@ function exportCSV() {
   a.click();
   URL.revokeObjectURL(url);
   showToast('📤 Export CSV téléchargé', 'success');
+}
+
+// ========= BACKUP: CSV BY EMAIL =========
+function generateCSVContent() {
+  const data = loadData();
+  if (data.length === 0) return null;
+  const headers = ['Date','Nom','Prénom','Statut','Type Consultation','N° Séance','Type Patient','Précision','Motif Principal','Motif Secondaire','Allaitement','Orientation','Situation Risque','Type Risque','Notes'];
+  const rows = data.map(r => [
+    r.date, r.nom, r.prenom, r.statut, r.typeConsult, r.numSeance || '', r.typePatient, r.precision,
+    r.motifPrincipal, r.motifSecondaire,
+    r.allaitement, r.orientation, r.situationRisque ? 'OUI' : '', (r.riskTypes || []).join(', '), r.notes
+  ].map(v => `"${String(v || '').replace(/"/g,'""')}"`).join(','));
+  return [headers.join(','), ...rows].join('\n');
+}
+
+function emailBackupCSV() {
+  const data = loadData();
+  if (data.length === 0) { showToast('Aucune donnée à sauvegarder', 'error'); return; }
+
+  const csv = generateCSVContent();
+  const dateStr = new Date().toISOString().split('T')[0];
+  const fileName = `OsteoPMI_Sauvegarde_${dateStr}.csv`;
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+  const file = new File([blob], fileName, { type: 'text/csv' });
+
+  // Use Web Share API (native on iPhone) if available
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    navigator.share({
+      title: 'Sauvegarde OstéoPMI',
+      text: `Sauvegarde du ${new Date().toLocaleDateString('fr-FR')} — ${data.length} séance(s)`,
+      files: [file]
+    }).then(() => {
+      markBackupDone();
+      showToast('Sauvegarde envoyée', 'success');
+    }).catch(() => {});
+  } else {
+    // Fallback: download + open mailto
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    URL.revokeObjectURL(url);
+    const subject = encodeURIComponent(`Sauvegarde OstéoPMI — ${dateStr}`);
+    const body = encodeURIComponent(`Bonjour,\n\nVeuillez trouver en pièce jointe la sauvegarde OstéoPMI du ${new Date().toLocaleDateString('fr-FR')} (${data.length} séance(s)).\n\nPensez à joindre le fichier ${fileName} téléchargé.\n\nCordialement`);
+    window.open(`mailto:florianeguilbaud.osteo@gmail.com?subject=${subject}&body=${body}`, '_self');
+    markBackupDone();
+    showToast('CSV téléchargé — joindre à l\'e-mail', 'success');
+  }
+}
+
+function markBackupDone() {
+  const weekId = getWeekId();
+  localStorage.setItem('osteo_pmi_last_backup', weekId);
+  document.getElementById('backup-banner').style.display = 'none';
+  updateBackupStatus();
+}
+
+// ========= BACKUP: JSON EXPORT/IMPORT =========
+function exportBackupJSON() {
+  const data = loadData();
+  if (data.length === 0) { showToast('Aucune donnée à sauvegarder', 'error'); return; }
+  const backup = {
+    app: 'OstéoPMI',
+    version: 'v2.1',
+    exportDate: new Date().toISOString(),
+    count: data.length,
+    seances: data
+  };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `OsteoPMI_Backup_${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  markBackupDone();
+  showToast('Sauvegarde JSON téléchargée', 'success');
+}
+
+function importBackupJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const backup = JSON.parse(e.target.result);
+      const imported = backup.seances || backup;
+      if (!Array.isArray(imported)) throw new Error('Format invalide');
+
+      const existing = loadData();
+      const existingIds = new Set(existing.map(r => r.id));
+      let added = 0;
+      imported.forEach(r => {
+        if (r.id && !existingIds.has(r.id)) {
+          existing.push(r);
+          existingIds.add(r.id);
+          added++;
+        }
+      });
+      existing.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+      saveData(existing);
+      showToast(`${added} séance(s) importée(s), ${imported.length - added} doublon(s) ignoré(s)`, 'success');
+    } catch (err) {
+      showToast('Fichier invalide', 'error');
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// ========= MONDAY BACKUP REMINDER =========
+function getWeekId() {
+  const d = new Date();
+  const start = new Date(d.getFullYear(), 0, 1);
+  const weekNo = Math.ceil(((d - start) / 86400000 + start.getDay() + 1) / 7);
+  return `${d.getFullYear()}-W${weekNo}`;
+}
+
+function checkBackupReminder() {
+  const today = new Date();
+  const isMonday = today.getDay() === 1;
+  const lastBackup = localStorage.getItem('osteo_pmi_last_backup') || '';
+  const currentWeek = getWeekId();
+  const data = loadData();
+
+  if (isMonday && lastBackup !== currentWeek && data.length > 0) {
+    document.getElementById('backup-banner').style.display = 'block';
+  }
+  updateBackupStatus();
+}
+
+function dismissBackupBanner(e) {
+  e.stopPropagation();
+  document.getElementById('backup-banner').style.display = 'none';
+  localStorage.setItem('osteo_pmi_last_backup', getWeekId());
+}
+
+function updateBackupStatus() {
+  const lastBackup = localStorage.getItem('osteo_pmi_last_backup');
+  const el = document.getElementById('backup-status');
+  if (lastBackup) {
+    el.textContent = 'Dernière sauvegarde : semaine ' + lastBackup;
+  } else {
+    el.textContent = 'Aucune sauvegarde effectuée';
+  }
 }
 
 // ========= TOAST =========
